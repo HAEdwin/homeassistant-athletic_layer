@@ -256,13 +256,16 @@ class AthleticLayerCard extends HTMLElement {
     } else {
       this._update();
     }
-    // When the frontend language changes, immediately ask the backend
-    // to regenerate advice in the new language (avoids 30 s polling lag).
+    // When the frontend language changes, tell the backend directly
+    // so advice regenerates in the new language without file-IO lag.
     const newLang = hass.language;
     if (prevLang && newLang && prevLang !== newLang && this._config) {
-      this._hass.callService("homeassistant", "update_entity", {
-        entity_id: this._config.entity,
-      });
+      const lang = newLang.split("-")[0].toLowerCase();
+      this._hass.callWS({
+        type: "fire_event",
+        event_type: "athletic_layer_language_changed",
+        event_data: { language: lang },
+      }).catch(() => {});
     }
   }
 
