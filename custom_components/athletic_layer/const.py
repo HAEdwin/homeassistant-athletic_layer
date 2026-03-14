@@ -12,10 +12,29 @@ CONF_ZONE = "zone"
 
 SPORT_RUNNING = "running"
 SPORT_CYCLING = "cycling"
-SPORTS = [SPORT_RUNNING, SPORT_CYCLING]
+SPORT_HIKING = "hiking"
+SPORT_WALKING = "walking"
+SPORTS = [SPORT_RUNNING, SPORT_CYCLING, SPORT_HIKING, SPORT_WALKING]
 
 SUPPORTED_LANGUAGES = {"en", "nl", "de", "fr", "es"}
 DEFAULT_LANGUAGE = "en"
+
+# ── Translated sport display names per language ─────────────────────
+SPORT_NAMES: dict[str, dict[str, str]] = {
+    "en": {"running": "Running", "cycling": "Cycling", "hiking": "Hiking", "walking": "Walking"},
+    "nl": {"running": "Hardlopen", "cycling": "Fietsen", "hiking": "Wandelen", "walking": "Wandelen"},
+    "de": {"running": "Laufen", "cycling": "Radfahren", "hiking": "Wandern", "walking": "Gehen"},
+    "fr": {"running": "Course", "cycling": "Cyclisme", "hiking": "Randonnée", "walking": "Marche"},
+    "es": {"running": "Correr", "cycling": "Ciclismo", "hiking": "Senderismo", "walking": "Caminar"},
+}
+
+ADVICE_LABEL: dict[str, str] = {
+    "en": "Clothing Advice",
+    "nl": "Kledingadvies",
+    "de": "Kleidungsempfehlung",
+    "fr": "Conseil vestimentaire",
+    "es": "Consejo de vestimenta",
+}
 
 # ── Unit systems per language ───────────────────────────────────────
 # English (US) → imperial; all others → metric.

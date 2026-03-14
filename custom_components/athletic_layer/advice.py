@@ -276,6 +276,9 @@ class AdviceEngine:
             feels -= 3.0
         elif self._sport == "running":
             feels += 2.0
+        elif self._sport == "hiking":
+            feels += 1.0
+        # walking: no correction (moderate pace, neutral exertion)
 
         return feels
 
@@ -289,30 +292,25 @@ class AdviceEngine:
         acc = self._accessories(layers)
         t = self._t
         bike = self._sport == "cycling"
+        bp = {"cycling": "bike", "hiking": "hike", "walking": "walk"}.get(self._sport, "run")
 
         if adjusted >= 30:
             layers["base"] = _pick(t, "layer_base_singlet")
-            layers["bottoms"] = _pick(
-                t, "bottom_bike_shorts" if bike else "bottom_run_shorts"
-            )
+            layers["bottoms"] = _pick(t, f"bottom_{bp}_shorts")
             return _pick(t, "temp_hot", seed)
         if adjusted >= 20:
             layers["base"] = _pick(t, "layer_base_singlet")
-            layers["bottoms"] = _pick(
-                t, "bottom_bike_shorts" if bike else "bottom_run_shorts"
-            )
+            layers["bottoms"] = _pick(t, f"bottom_{bp}_shorts")
             return _pick(t, "temp_warm", seed)
         if adjusted >= 15:
             layers["base"] = _pick(t, "layer_base_short")
-            layers["bottoms"] = _pick(
-                t, "bottom_bike_shorts" if bike else "bottom_run_shorts"
-            )
+            layers["bottoms"] = _pick(t, f"bottom_{bp}_shorts")
             return _pick(t, "temp_cool", seed)
         if adjusted >= 5:
             layers["base"] = _pick(t, "layer_base_long")
             layers["mid"] = _pick(t, "layer_mid_light")
             layers["bottoms"] = _pick(
-                t, "bottom_bike_34_tights" if bike else "bottom_run_34_tights"
+                t, f"bottom_{bp}_34_tights" if bike else f"bottom_{bp}_34_{'tights' if bp == 'run' else 'pants'}"
             )
             arm_w = _pick(t, "acc_arm_warmers")
             if arm_w not in acc:
@@ -324,7 +322,7 @@ class AdviceEngine:
             layers["mid"] = _pick(t, "layer_mid_insulating")
             layers["outer"] = _pick(t, "layer_outer_windproof")
             layers["bottoms"] = _pick(
-                t, "bottom_bike_tights" if bike else "bottom_run_tights"
+                t, f"bottom_{bp}_tights" if bike else f"bottom_{bp}_{'tights' if bp == 'run' else 'pants'}"
             )
             acc.extend([_pick(t, "acc_gloves"), _pick(t, "acc_headband")])
             leg_w = _pick(t, "acc_leg_warmers")
@@ -337,7 +335,7 @@ class AdviceEngine:
         layers["mid"] = _pick(t, "layer_mid_insulating")
         layers["outer"] = _pick(t, "layer_outer_windproof")
         layers["bottoms"] = _pick(
-            t, "bottom_bike_thermal_tights" if bike else "bottom_run_thermal_tights"
+            t, f"bottom_{bp}_thermal_tights" if bike else f"bottom_{bp}_thermal_{'tights' if bp == 'run' else 'pants'}"
         )
         acc.extend([_pick(t, "acc_gloves"), _pick(t, "acc_headband")])
         leg_w = _pick(t, "acc_leg_warmers")

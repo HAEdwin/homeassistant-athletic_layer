@@ -33,10 +33,13 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .advice import AdviceEngine, HourAdvice, WeatherSlice
 from .const import (
+    ADVICE_LABEL,
     CONF_HEALTH_CONDITIONS,
     CONF_SPORT,
+    CONF_USER_ID,
     DEFAULT_LANGUAGE,
     DOMAIN,
+    SPORT_NAMES,
     SUPPORTED_LANGUAGES,
     WMO_CODES,
 )
@@ -550,25 +553,49 @@ class AthleticLayerSensor(CoordinatorEntity[AthleticLayerCoordinator], SensorEnt
 # ── Helper ──────────────────────────────────────────────────────────
 
 
-def _read_user_language(storage_dir: str) -> str | None:
-    """Read the first user's language from HA frontend storage files."""
+def _read_user_language(storage_dir: str, user_id: str | None = None) -> str | None:
+    """Read a user's language from HA frontend storage files."""
     import os
 
     try:
+        # If a user_id is known, try that specific file first.
+        if user_id:
+            target = f"frontend.user_data_{user_id}"
+            path = os.path.join(storage_dir, target)
+            lang = _extract_language_from_file(path)
+            if lang:
+                return lang
+
+        # Fall back to scanning all user files.
         for name in sorted(os.listdir(storage_dir)):
             if not name.startswith("frontend.user_data_"):
                 continue
             path = os.path.join(storage_dir, name)
-            with open(path, encoding="utf-8") as fh:
-                raw = json.load(fh)
-            data = raw.get("data") if isinstance(raw, dict) else None
-            if not isinstance(data, dict):
-                continue
-            lang = data.get("language")
-            if isinstance(lang, dict):
-                lang = lang.get("language")
-            if isinstance(lang, str) and lang:
+            lang = _extract_language_from_file(path)
+            if lang:
                 return lang
+    except Exception:
+        pass
+    return None
+
+
+def _extract_language_from_file(path: str) -> str | None:
+    """Extract the language string from a single frontend storage file."""
+    import os
+
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as fh:
+            raw = json.load(fh)
+        data = raw.get("data") if isinstance(raw, dict) else None
+        if not isinstance(data, dict):
+            return None
+        lang = data.get("language")
+        if isinstance(lang, dict):
+            lang = lang.get("language")
+        if isinstance(lang, str) and lang:
+            return lang
     except Exception:
         pass
     return None
@@ -690,7 +717,6 @@ class AthleticLayerAdviceSensor(
     """
 
     _attr_has_entity_name = True
-    _attr_translation_key = "clothing_advice"
     _attr_icon = "mdi:tshirt-crew"
 
     _LANGUAGE_CHECK_INTERVAL = timedelta(seconds=30)
@@ -704,7 +730,9 @@ class AthleticLayerAdviceSensor(
         super().__init__(coordinator)
         self._entry = entry
         self._attr_unique_id = f"{entry.entry_id}_clothing_advice"
+        self._sport = entry.data.get(CONF_SPORT, "running")
         self._cached_language: str | None = None
+        self._attr_name = self._build_display_name(DEFAULT_LANGUAGE)
 
     async def async_added_to_hass(self) -> None:
         """Register listeners for language changes."""
@@ -714,6 +742,7 @@ class AthleticLayerAdviceSensor(
         self._cached_language = await self.hass.async_add_executor_job(
             self._resolve_language
         )
+        self._attr_name = self._build_display_name(self._cached_language)
 
         # React immediately to system-level language changes
         self.async_on_remove(
@@ -736,6 +765,11 @@ class AthleticLayerAdviceSensor(
         """Handle system-level config changes (e.g. language)."""
         self.hass.async_create_task(self._async_check_language())
 
+    async def async_update(self) -> None:
+        """Handle update_entity calls: re-check language, then refresh data."""
+        await self._async_check_language()
+        await super().async_update()
+
     async def _async_check_language(self, _now: datetime | None = None) -> None:
         """Check if the resolved language changed and refresh advice."""
         new_lang = await self.hass.async_add_executor_job(self._resolve_language)
@@ -746,7 +780,16 @@ class AthleticLayerAdviceSensor(
                 new_lang,
             )
             self._cached_language = new_lang
+            self._attr_name = self._build_display_name(new_lang)
             self.async_write_ha_state()
+
+    def _build_display_name(self, lang: str) -> str:
+        """Build the translated display name including the sport."""
+        label = ADVICE_LABEL.get(lang, ADVICE_LABEL["en"])
+        sport = SPORT_NAMES.get(lang, SPORT_NAMES["en"]).get(
+            self._sport, self._sport.replace("_", " ").title()
+        )
+        return f"{label} ({sport})"
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -791,6 +834,8 @@ class AthleticLayerAdviceSensor(
             "warnings": current.warnings,
             "health_adjustments": current.health_adjustments,
             "advice_hourly": hourly_advice,
+            "language": self._cached_language or DEFAULT_LANGUAGE,
+            "sport": self._sport,
         }
 
     # ── private helpers ─────────────────────────────────────────
@@ -798,8 +843,8 @@ class AthleticLayerAdviceSensor(
     def _build_engine(self) -> AdviceEngine:
         sport = self._entry.data.get(CONF_SPORT, "running")
         conditions = self._entry.data.get(CONF_HEALTH_CONDITIONS, [])
-        language = self._resolve_language()
-        _LOGGER.debug("AthleticLayer advice language resolved to: %s", language)
+        language = self._cached_language or DEFAULT_LANGUAGE
+        _LOGGER.debug("AthleticLayer advice engine language: %s", language)
         return AdviceEngine(
             sport=sport,
             health_conditions=conditions,
@@ -807,24 +852,25 @@ class AthleticLayerAdviceSensor(
         )
 
     def _resolve_language(self) -> str:
-        """Resolve advice language from HA system config, then user profile."""
-        # 1) HA system language (the authoritative system-wide setting)
-        sys_lang = self.hass.config.language
-        if sys_lang:
-            code = sys_lang[:2].lower()
-            if code in SUPPORTED_LANGUAGES:
-                return code
-
-        # 2) Fall back to user profile language from .storage/frontend.user_data_*
+        """Resolve advice language: user profile first, then system config."""
+        # 1) User-profile language (specific to the user who created this entry)
         try:
             storage_dir = self.hass.config.path(".storage")
-            lang = _read_user_language(storage_dir)
+            user_id = self._entry.data.get(CONF_USER_ID)
+            lang = _read_user_language(storage_dir, user_id)
             if lang:
                 code = lang[:2].lower()
                 if code in SUPPORTED_LANGUAGES:
                     return code
         except Exception:
             pass
+
+        # 2) Fall back to HA system language
+        sys_lang = self.hass.config.language
+        if sys_lang:
+            code = sys_lang[:2].lower()
+            if code in SUPPORTED_LANGUAGES:
+                return code
 
         return DEFAULT_LANGUAGE
 
