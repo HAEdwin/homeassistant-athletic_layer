@@ -79,6 +79,7 @@ const CARD_I18N = {
       layer_base: "Base", layer_mid: "Mid", layer_outer: "Outer",
       layer_bottoms: "Bottoms", layer_accessories: "Accessories",
     },
+    sports: { running: "Running", cycling: "Cycling", hiking: "Hiking", walking: "Walking" },
   },
   de: {
     conditions: {
@@ -110,6 +111,7 @@ const CARD_I18N = {
       layer_base: "Basis", layer_mid: "Mittel", layer_outer: "Außen",
       layer_bottoms: "Hose", layer_accessories: "Zubehör",
     },
+    sports: { running: "Laufen", cycling: "Radfahren", hiking: "Wandern", walking: "Gehen" },
   },
   es: {
     conditions: {
@@ -141,6 +143,7 @@ const CARD_I18N = {
       layer_base: "Base", layer_mid: "Intermedia", layer_outer: "Exterior",
       layer_bottoms: "Pantalón", layer_accessories: "Accesorios",
     },
+    sports: { running: "Correr", cycling: "Ciclismo", hiking: "Senderismo", walking: "Caminar" },
   },
   fr: {
     conditions: {
@@ -172,6 +175,7 @@ const CARD_I18N = {
       layer_base: "Base", layer_mid: "Intermédiaire", layer_outer: "Extérieure",
       layer_bottoms: "Pantalon", layer_accessories: "Accessoires",
     },
+    sports: { running: "Course", cycling: "Cyclisme", hiking: "Randonnée", walking: "Marche" },
   },
   nl: {
     conditions: {
@@ -203,6 +207,7 @@ const CARD_I18N = {
       layer_base: "Basis", layer_mid: "Midden", layer_outer: "Buiten",
       layer_bottoms: "Broek", layer_accessories: "Accessoires",
     },
+    sports: { running: "Hardlopen", cycling: "Fietsen", hiking: "Wandelen", walking: "Wandelen" },
   },
 };
 
@@ -243,12 +248,21 @@ function entityAttr(hass, id, attr) {
 /* ── Card class ───────────────────────────────────────────────── */
 class AthleticLayerCard extends HTMLElement {
   set hass(hass) {
+    const prevLang = this._hass ? this._hass.language : undefined;
     this._hass = hass;
     if (!this._rendered) {
       this._render();
       this._rendered = true;
     } else {
       this._update();
+    }
+    // When the frontend language changes, immediately ask the backend
+    // to regenerate advice in the new language (avoids 30 s polling lag).
+    const newLang = hass.language;
+    if (prevLang && newLang && prevLang !== newLang && this._config) {
+      this._hass.callService("homeassistant", "update_entity", {
+        entity_id: this._config.entity,
+      });
     }
   }
 
@@ -282,8 +296,13 @@ class AthleticLayerCard extends HTMLElement {
   /* ── i18n helpers ──────────────────────────────────────── */
   _lang() {
     if (!this._hass) return "en";
+    // Use the HA frontend language (updates immediately when user changes profile)
     const lang = (this._hass.language || "en").split("-")[0].toLowerCase();
-    return CARD_I18N[lang] ? lang : "en";
+    if (CARD_I18N[lang]) return lang;
+    // Fall back to the sensor's resolved language
+    const sensorLang = entityAttr(this._hass, this._config.entity, "language");
+    if (sensorLang && CARD_I18N[sensorLang]) return sensorLang;
+    return "en";
   }
 
   _i18n() {
@@ -396,13 +415,15 @@ class AthleticLayerCard extends HTMLElement {
       const cloud = entityNumeric(h, this._e("cloud_cover"));
       const sunrise = entityState(h, this._e("sunrise"));
       const sunset = entityState(h, this._e("sunset"));
+      const windUnit = entityAttr(h, this._e("wind_speed"), "unit_of_measurement") || "km/h";
+      const precipUnit = entityAttr(h, this._e("precipitation"), "unit_of_measurement") || "mm";
 
       $("al-weather").innerHTML = `
-        ${this._weatherTile("mdi:weather-windy", this._t("tile_wind"), wind != null ? `${wind.toFixed(0)} km/h ${this._twd(dir)}` : "—")}
-        ${this._weatherTile("mdi:weather-windy-variant", this._t("tile_gusts"), gusts != null ? `${gusts.toFixed(0)} km/h` : "—")}
+        ${this._weatherTile("mdi:weather-windy", this._t("tile_wind"), wind != null ? `${wind.toFixed(0)} ${windUnit} ${this._twd(dir)}` : "—")}
+        ${this._weatherTile("mdi:weather-windy-variant", this._t("tile_gusts"), gusts != null ? `${gusts.toFixed(0)} ${windUnit}` : "—")}
         ${this._weatherTile("mdi:water-percent", this._t("tile_humidity"), hum != null ? `${hum}%` : "—")}
         ${this._weatherTile("mdi:sun-wireless", this._t("tile_uv"), uv != null ? uv.toFixed(1) : "—")}
-        ${this._weatherTile("mdi:weather-rainy", this._t("tile_rain"), precip != null ? `${precip.toFixed(1)} mm` : "—")}
+        ${this._weatherTile("mdi:weather-rainy", this._t("tile_rain"), precip != null ? `${precip.toFixed(1)} ${precipUnit}` : "—")}
         ${this._weatherTile("mdi:cloud-percent-outline", this._t("tile_rain_prob"), precipP != null ? `${precipP}%` : "—")}
         ${this._weatherTile("mdi:cloud", this._t("tile_clouds"), cloud != null ? `${cloud}%` : "—")}
         ${this._weatherTile("mdi:weather-sunset-up", this._t("tile_sunrise"), sunrise && sunrise !== "unknown" ? sunrise : "—")}
@@ -416,11 +437,13 @@ class AthleticLayerCard extends HTMLElement {
     const adviceState = entityState(h, c.entity);
     const detailed = entityAttr(h, c.entity, "detailed_advice");
     const generated = entityAttr(h, c.entity, "generated_at");
+    const sport = entityAttr(h, c.entity, "sport") || "";
+    const sportLabel = sport ? (this._i18n().sports[sport] || CARD_I18N.en.sports[sport] || sport.replace("_", " ")) : "";
 
-    $("al-advice-section").innerHTML = (detailed || adviceState)
-      ? `<div class="al-sect-title"><ha-icon icon="mdi:tshirt-crew"></ha-icon> ${this._t("sect_clothing")}</div>
+    $('al-advice-section').innerHTML = (detailed || adviceState)
+      ? `<div class="al-sect-title"><ha-icon icon="mdi:tshirt-crew"></ha-icon> ${this._t('sect_clothing')}${sportLabel ? ` <span class="al-sport-badge">${this._esc(sportLabel)}</span>` : ''}</div>
          <div class="al-advice-text">${this._esc(detailed || adviceState)}</div>
-         ${generated ? `<div class="al-generated-at">${this._t("updated")} ${this._esc(generated)}</div>` : ""}`
+         ${generated ? `<div class="al-generated-at">${this._t('updated')} ${this._esc(generated)}</div>` : ''}`
       : "";
 
     /* ── Layer breakdown ───────────────────────────────────── */
@@ -707,6 +730,15 @@ class AthleticLayerCard extends HTMLElement {
       .al-sect-title ha-icon {
         --mdc-icon-size: 18px;
         color: var(--state-icon-color, var(--paper-item-icon-color));
+      }
+      .al-sport-badge {
+        font-size: 0.78rem;
+        font-weight: 500;
+        padding: 1px 8px;
+        border-radius: 10px;
+        background: var(--primary-color, #03a9f4);
+        color: var(--text-primary-color, #fff);
+        margin-left: 4px;
       }
 
       /* ── Advice text ───────────────────────────────────── */
