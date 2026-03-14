@@ -763,6 +763,14 @@ class AthleticLayerAdviceSensor(
             )
         )
 
+        # React immediately when the Lovelace card reports a language change
+        self.async_on_remove(
+            self.hass.bus.async_listen(
+                "athletic_layer_language_changed",
+                self._async_on_frontend_language_changed,
+            )
+        )
+
         # Poll for user-profile language changes (stored on disk)
         self.async_on_remove(
             async_track_time_interval(
@@ -776,6 +784,18 @@ class AthleticLayerAdviceSensor(
     def _async_on_core_config_update(self, event: Event) -> None:
         """Handle system-level config changes (e.g. language)."""
         self.hass.async_create_task(self._async_check_language())
+
+    @callback
+    def _async_on_frontend_language_changed(self, event: Event) -> None:
+        """Handle language change reported by the Lovelace card."""
+        lang = (event.data.get("language") or "")[:2].lower()
+        if lang in SUPPORTED_LANGUAGES and lang != self._cached_language:
+            _LOGGER.debug(
+                "Frontend language event: %s -> %s", self._cached_language, lang
+            )
+            self._cached_language = lang
+            self._attr_name = self._build_display_name(lang)
+            self.async_write_ha_state()
 
     async def async_update(self) -> None:
         """Handle update_entity calls: re-check language, then refresh data."""
