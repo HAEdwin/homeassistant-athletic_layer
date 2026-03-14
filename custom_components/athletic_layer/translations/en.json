@@ -1,0 +1,98 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Athletic Layer",
+                "description": "Set up your sport and health profile for personalized clothing advice.",
+                "data": {
+                    "zone": "Zone",
+                    "sport": "Sport",
+                    "health_conditions": "Health conditions"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Athletic Layer Options",
+                "description": "Update your sport and health preferences.",
+                "data": {
+                    "zone": "Zone",
+                    "sport": "Sport",
+                    "health_conditions": "Health conditions"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "temperature": { "name": "Temperature" },
+            "feels_like_temperature": { "name": "Feels like temperature" },
+            "weather_condition": {
+                "name": "Weather condition",
+                "state": {
+                    "clear_sky": "Clear sky",
+                    "mainly_clear": "Mainly clear",
+                    "partly_cloudy": "Partly cloudy",
+                    "overcast": "Overcast",
+                    "fog": "Fog",
+                    "depositing_rime_fog": "Depositing rime fog",
+                    "light_drizzle": "Light drizzle",
+                    "moderate_drizzle": "Moderate drizzle",
+                    "dense_drizzle": "Dense drizzle",
+                    "light_freezing_drizzle": "Light freezing drizzle",
+                    "dense_freezing_drizzle": "Dense freezing drizzle",
+                    "slight_rain": "Slight rain",
+                    "moderate_rain": "Moderate rain",
+                    "heavy_rain": "Heavy rain",
+                    "light_freezing_rain": "Light freezing rain",
+                    "heavy_freezing_rain": "Heavy freezing rain",
+                    "slight_snow_fall": "Slight snow fall",
+                    "moderate_snow_fall": "Moderate snow fall",
+                    "heavy_snow_fall": "Heavy snow fall",
+                    "snow_grains": "Snow grains",
+                    "slight_rain_showers": "Slight rain showers",
+                    "moderate_rain_showers": "Moderate rain showers",
+                    "violent_rain_showers": "Violent rain showers",
+                    "slight_snow_showers": "Slight snow showers",
+                    "heavy_snow_showers": "Heavy snow showers",
+                    "thunderstorm": "Thunderstorm",
+                    "thunderstorm_slight_hail": "Thunderstorm with slight hail",
+                    "thunderstorm_heavy_hail": "Thunderstorm with heavy hail"
+                }
+            },
+            "wind_speed": { "name": "Wind speed" },
+            "wind_direction": { "name": "Wind direction" },
+            "wind_gusts": { "name": "Wind gusts" },
+            "humidity": { "name": "Humidity" },
+            "pressure": { "name": "Pressure" },
+            "cloud_cover": { "name": "Cloud cover" },
+            "precipitation": { "name": "Precipitation" },
+            "uv_index": { "name": "UV index" },
+            "dew_point": { "name": "Dew point" },
+            "precipitation_probability": { "name": "Precipitation probability" },
+            "rainfall_forecast_8h": { "name": "Rainfall forecast (8 h)" },
+            "rain_h1": { "name": "Rain forecast +1 h" },
+            "rain_h2": { "name": "Rain forecast +2 h" },
+            "rain_h3": { "name": "Rain forecast +3 h" },
+            "rain_h4": { "name": "Rain forecast +4 h" },
+            "rain_h5": { "name": "Rain forecast +5 h" },
+            "rain_h6": { "name": "Rain forecast +6 h" },
+            "rain_h7": { "name": "Rain forecast +7 h" },
+            "rain_h8": { "name": "Rain forecast +8 h" },
+            "air_quality_index": { "name": "Air quality index" },
+            "pm25": { "name": "PM2.5" },
+            "pm10": { "name": "PM10" },
+            "pollen_grass": { "name": "Grass pollen" },
+            "pollen_birch": { "name": "Birch pollen" },
+            "pollen_alder": { "name": "Alder pollen" },
+            "pollen_mugwort": { "name": "Mugwort pollen" },
+            "pollen_olive": { "name": "Olive pollen" },
+            "pollen_ragweed": { "name": "Ragweed pollen" },
+            "sunrise": { "name": "Sunrise" },
+            "sunset": { "name": "Sunset" },
+            "clothing_advice": { "name": "Clothing Advice" }
+        }
+    }
+}

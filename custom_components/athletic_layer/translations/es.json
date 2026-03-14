@@ -1,0 +1,98 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Athletic Layer",
+                "description": "Configura tu perfil deportivo y de salud para consejos de vestimenta personalizados.",
+                "data": {
+                    "zone": "Zona",
+                    "sport": "Deporte",
+                    "health_conditions": "Condiciones de salud"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Opciones de Athletic Layer",
+                "description": "Actualiza tus preferencias deportivas y de salud.",
+                "data": {
+                    "zone": "Zona",
+                    "sport": "Deporte",
+                    "health_conditions": "Condiciones de salud"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "temperature": { "name": "Temperatura" },
+            "feels_like_temperature": { "name": "Sensación térmica" },
+            "weather_condition": {
+                "name": "Condición meteorológica",
+                "state": {
+                    "clear_sky": "Cielo despejado",
+                    "mainly_clear": "Mayormente despejado",
+                    "partly_cloudy": "Parcialmente nublado",
+                    "overcast": "Nublado",
+                    "fog": "Niebla",
+                    "depositing_rime_fog": "Niebla con escarcha",
+                    "light_drizzle": "Llovizna ligera",
+                    "moderate_drizzle": "Llovizna moderada",
+                    "dense_drizzle": "Llovizna densa",
+                    "light_freezing_drizzle": "Llovizna helada ligera",
+                    "dense_freezing_drizzle": "Llovizna helada densa",
+                    "slight_rain": "Lluvia ligera",
+                    "moderate_rain": "Lluvia moderada",
+                    "heavy_rain": "Lluvia fuerte",
+                    "light_freezing_rain": "Lluvia helada ligera",
+                    "heavy_freezing_rain": "Lluvia helada fuerte",
+                    "slight_snow_fall": "Nevada ligera",
+                    "moderate_snow_fall": "Nevada moderada",
+                    "heavy_snow_fall": "Nevada fuerte",
+                    "snow_grains": "Granos de nieve",
+                    "slight_rain_showers": "Chubascos ligeros",
+                    "moderate_rain_showers": "Chubascos moderados",
+                    "violent_rain_showers": "Chubascos violentos",
+                    "slight_snow_showers": "Chubascos de nieve ligeros",
+                    "heavy_snow_showers": "Chubascos de nieve fuertes",
+                    "thunderstorm": "Tormenta eléctrica",
+                    "thunderstorm_slight_hail": "Tormenta con granizo ligero",
+                    "thunderstorm_heavy_hail": "Tormenta con granizo fuerte"
+                }
+            },
+            "wind_speed": { "name": "Velocidad del viento" },
+            "wind_direction": { "name": "Dirección del viento" },
+            "wind_gusts": { "name": "Rachas de viento" },
+            "humidity": { "name": "Humedad" },
+            "pressure": { "name": "Presión atmosférica" },
+            "cloud_cover": { "name": "Nubosidad" },
+            "precipitation": { "name": "Precipitación" },
+            "uv_index": { "name": "Índice UV" },
+            "dew_point": { "name": "Punto de rocío" },
+            "precipitation_probability": { "name": "Probabilidad de precipitación" },
+            "rainfall_forecast_8h": { "name": "Previsión de lluvia (8 h)" },
+            "rain_h1": { "name": "Previsión de lluvia +1 h" },
+            "rain_h2": { "name": "Previsión de lluvia +2 h" },
+            "rain_h3": { "name": "Previsión de lluvia +3 h" },
+            "rain_h4": { "name": "Previsión de lluvia +4 h" },
+            "rain_h5": { "name": "Previsión de lluvia +5 h" },
+            "rain_h6": { "name": "Previsión de lluvia +6 h" },
+            "rain_h7": { "name": "Previsión de lluvia +7 h" },
+            "rain_h8": { "name": "Previsión de lluvia +8 h" },
+            "air_quality_index": { "name": "Índice de calidad del aire" },
+            "pm25": { "name": "PM2,5" },
+            "pm10": { "name": "PM10" },
+            "pollen_grass": { "name": "Polen de gramíneas" },
+            "pollen_birch": { "name": "Polen de abedul" },
+            "pollen_alder": { "name": "Polen de aliso" },
+            "pollen_mugwort": { "name": "Polen de artemisa" },
+            "pollen_olive": { "name": "Polen de olivo" },
+            "pollen_ragweed": { "name": "Polen de ambrosía" },
+            "sunrise": { "name": "Amanecer" },
+            "sunset": { "name": "Atardecer" },
+            "clothing_advice": { "name": "Consejo de vestimenta" }
+        }
+    }
+}

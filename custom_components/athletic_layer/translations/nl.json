@@ -1,0 +1,98 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Athletic Layer",
+                "description": "Stel je sport- en gezondheidsprofiel in voor persoonlijk kledingadvies.",
+                "data": {
+                    "zone": "Zone",
+                    "sport": "Sport",
+                    "health_conditions": "Gezondheidsaandoeningen"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Athletic Layer Opties",
+                "description": "Werk je sport- en gezondheidsvoorkeuren bij.",
+                "data": {
+                    "zone": "Zone",
+                    "sport": "Sport",
+                    "health_conditions": "Gezondheidsaandoeningen"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "temperature": { "name": "Temperatuur" },
+            "feels_like_temperature": { "name": "Gevoelstemperatuur" },
+            "weather_condition": {
+                "name": "Weersomstandigheid",
+                "state": {
+                    "clear_sky": "Onbewolkt",
+                    "mainly_clear": "Overwegend helder",
+                    "partly_cloudy": "Halfbewolkt",
+                    "overcast": "Bewolkt",
+                    "fog": "Mist",
+                    "depositing_rime_fog": "Aanvriezende mist",
+                    "light_drizzle": "Lichte motregen",
+                    "moderate_drizzle": "Matige motregen",
+                    "dense_drizzle": "Dichte motregen",
+                    "light_freezing_drizzle": "Lichte ijzel",
+                    "dense_freezing_drizzle": "Dichte ijzel",
+                    "slight_rain": "Lichte regen",
+                    "moderate_rain": "Matige regen",
+                    "heavy_rain": "Zware regen",
+                    "light_freezing_rain": "Lichte ijsregen",
+                    "heavy_freezing_rain": "Zware ijsregen",
+                    "slight_snow_fall": "Lichte sneeuwval",
+                    "moderate_snow_fall": "Matige sneeuwval",
+                    "heavy_snow_fall": "Zware sneeuwval",
+                    "snow_grains": "Sneeuwkorrels",
+                    "slight_rain_showers": "Lichte regenbuien",
+                    "moderate_rain_showers": "Matige regenbuien",
+                    "violent_rain_showers": "Hevige regenbuien",
+                    "slight_snow_showers": "Lichte sneeuwbuien",
+                    "heavy_snow_showers": "Zware sneeuwbuien",
+                    "thunderstorm": "Onweer",
+                    "thunderstorm_slight_hail": "Onweer met lichte hagel",
+                    "thunderstorm_heavy_hail": "Onweer met zware hagel"
+                }
+            },
+            "wind_speed": { "name": "Windsnelheid" },
+            "wind_direction": { "name": "Windrichting" },
+            "wind_gusts": { "name": "Windstoten" },
+            "humidity": { "name": "Luchtvochtigheid" },
+            "pressure": { "name": "Luchtdruk" },
+            "cloud_cover": { "name": "Bewolking" },
+            "precipitation": { "name": "Neerslag" },
+            "uv_index": { "name": "UV-index" },
+            "dew_point": { "name": "Dauwpunt" },
+            "precipitation_probability": { "name": "Neerslagkans" },
+            "rainfall_forecast_8h": { "name": "Neerslagverwachting (8 u)" },
+            "rain_h1": { "name": "Neerslagverwachting +1 u" },
+            "rain_h2": { "name": "Neerslagverwachting +2 u" },
+            "rain_h3": { "name": "Neerslagverwachting +3 u" },
+            "rain_h4": { "name": "Neerslagverwachting +4 u" },
+            "rain_h5": { "name": "Neerslagverwachting +5 u" },
+            "rain_h6": { "name": "Neerslagverwachting +6 u" },
+            "rain_h7": { "name": "Neerslagverwachting +7 u" },
+            "rain_h8": { "name": "Neerslagverwachting +8 u" },
+            "air_quality_index": { "name": "Luchtkwaliteitsindex" },
+            "pm25": { "name": "PM2,5" },
+            "pm10": { "name": "PM10" },
+            "pollen_grass": { "name": "Graspollen" },
+            "pollen_birch": { "name": "Berkenpollen" },
+            "pollen_alder": { "name": "Elzenpollen" },
+            "pollen_mugwort": { "name": "Bijvoetpollen" },
+            "pollen_olive": { "name": "Olijfpollen" },
+            "pollen_ragweed": { "name": "Ambrosiapollen" },
+            "sunrise": { "name": "Zonsopkomst" },
+            "sunset": { "name": "Zonsondergang" },
+            "clothing_advice": { "name": "Kledingadvies" }
+        }
+    }
+}

@@ -1,0 +1,98 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Athletic Layer",
+                "description": "Richte dein Sport- und Gesundheitsprofil für personalisierte Kleidungsempfehlungen ein.",
+                "data": {
+                    "zone": "Zone",
+                    "sport": "Sportart",
+                    "health_conditions": "Gesundheitszustände"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Athletic Layer Optionen",
+                "description": "Aktualisiere deine Sport- und Gesundheitspräferenzen.",
+                "data": {
+                    "zone": "Zone",
+                    "sport": "Sportart",
+                    "health_conditions": "Gesundheitszustände"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "temperature": { "name": "Temperatur" },
+            "feels_like_temperature": { "name": "Gefühlte Temperatur" },
+            "weather_condition": {
+                "name": "Wetterlage",
+                "state": {
+                    "clear_sky": "Klarer Himmel",
+                    "mainly_clear": "Überwiegend klar",
+                    "partly_cloudy": "Teilweise bewölkt",
+                    "overcast": "Bedeckt",
+                    "fog": "Nebel",
+                    "depositing_rime_fog": "Gefrierender Nebel",
+                    "light_drizzle": "Leichter Nieselregen",
+                    "moderate_drizzle": "Mäßiger Nieselregen",
+                    "dense_drizzle": "Starker Nieselregen",
+                    "light_freezing_drizzle": "Leichter gefrierender Nieselregen",
+                    "dense_freezing_drizzle": "Starker gefrierender Nieselregen",
+                    "slight_rain": "Leichter Regen",
+                    "moderate_rain": "Mäßiger Regen",
+                    "heavy_rain": "Starker Regen",
+                    "light_freezing_rain": "Leichter Eisregen",
+                    "heavy_freezing_rain": "Starker Eisregen",
+                    "slight_snow_fall": "Leichter Schneefall",
+                    "moderate_snow_fall": "Mäßiger Schneefall",
+                    "heavy_snow_fall": "Starker Schneefall",
+                    "snow_grains": "Schneegriesel",
+                    "slight_rain_showers": "Leichte Regenschauer",
+                    "moderate_rain_showers": "Mäßige Regenschauer",
+                    "violent_rain_showers": "Heftige Regenschauer",
+                    "slight_snow_showers": "Leichte Schneeschauer",
+                    "heavy_snow_showers": "Starke Schneeschauer",
+                    "thunderstorm": "Gewitter",
+                    "thunderstorm_slight_hail": "Gewitter mit leichtem Hagel",
+                    "thunderstorm_heavy_hail": "Gewitter mit starkem Hagel"
+                }
+            },
+            "wind_speed": { "name": "Windgeschwindigkeit" },
+            "wind_direction": { "name": "Windrichtung" },
+            "wind_gusts": { "name": "Windböen" },
+            "humidity": { "name": "Luftfeuchtigkeit" },
+            "pressure": { "name": "Luftdruck" },
+            "cloud_cover": { "name": "Bewölkung" },
+            "precipitation": { "name": "Niederschlag" },
+            "uv_index": { "name": "UV-Index" },
+            "dew_point": { "name": "Taupunkt" },
+            "precipitation_probability": { "name": "Niederschlagswahrscheinlichkeit" },
+            "rainfall_forecast_8h": { "name": "Niederschlagsprognose (8 Std.)" },
+            "rain_h1": { "name": "Regenprognose +1 Std." },
+            "rain_h2": { "name": "Regenprognose +2 Std." },
+            "rain_h3": { "name": "Regenprognose +3 Std." },
+            "rain_h4": { "name": "Regenprognose +4 Std." },
+            "rain_h5": { "name": "Regenprognose +5 Std." },
+            "rain_h6": { "name": "Regenprognose +6 Std." },
+            "rain_h7": { "name": "Regenprognose +7 Std." },
+            "rain_h8": { "name": "Regenprognose +8 Std." },
+            "air_quality_index": { "name": "Luftqualitätsindex" },
+            "pm25": { "name": "PM2,5" },
+            "pm10": { "name": "PM10" },
+            "pollen_grass": { "name": "Gräserpollen" },
+            "pollen_birch": { "name": "Birkenpollen" },
+            "pollen_alder": { "name": "Erlenpollen" },
+            "pollen_mugwort": { "name": "Beifußpollen" },
+            "pollen_olive": { "name": "Olivenpollen" },
+            "pollen_ragweed": { "name": "Ambrosiapollen" },
+            "sunrise": { "name": "Sonnenaufgang" },
+            "sunset": { "name": "Sonnenuntergang" },
+            "clothing_advice": { "name": "Kleidungsempfehlung" }
+        }
+    }
+}
