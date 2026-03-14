@@ -1,11 +1,12 @@
 {
     "domain": "AthleticLayer",
     "name": "Athletic Layer",
-    "codeowners": [],
+    "codeowners": ["@haedwin"],
     "config_flow": true,
-    "documentation": "",
+    "documentation": "https://github.com/haedwin/homeassistant-Athletic_Layer",
     "integration_type": "service",
     "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/haedwin/homeassistant-Athletic_Layer/issues",
     "requirements": [],
-    "version": "1.0.0"
+    "version": "1.1.0"
 }
