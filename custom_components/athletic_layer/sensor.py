@@ -807,8 +807,15 @@ class AthleticLayerAdviceSensor(
         )
 
     def _resolve_language(self) -> str:
-        """Resolve advice language from the user's HA profile, then system."""
-        # 1) User profile language from .storage/frontend.user_data_*
+        """Resolve advice language from HA system config, then user profile."""
+        # 1) HA system language (the authoritative system-wide setting)
+        sys_lang = self.hass.config.language
+        if sys_lang:
+            code = sys_lang[:2].lower()
+            if code in SUPPORTED_LANGUAGES:
+                return code
+
+        # 2) Fall back to user profile language from .storage/frontend.user_data_*
         try:
             storage_dir = self.hass.config.path(".storage")
             lang = _read_user_language(storage_dir)
@@ -818,13 +825,6 @@ class AthleticLayerAdviceSensor(
                     return code
         except Exception:
             pass
-
-        # 2) Fall back to HA system language
-        sys_lang = self.hass.config.language
-        if sys_lang:
-            code = sys_lang[:2].lower()
-            if code in SUPPORTED_LANGUAGES:
-                return code
 
         return DEFAULT_LANGUAGE
 
