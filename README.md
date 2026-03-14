@@ -3,7 +3,7 @@
 [![version](https://img.shields.io/badge/version-1.0.0-blue)]()
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange)]()
 
-A **Home Assistant** custom integration that provides personalized clothing advice for outdoor **runners** and **cyclists**. It fetches real-time weather, air quality, and pollen data from the [Open-Meteo](https://open-meteo.com/) API and generates sport-specific layering recommendations adapted to your health conditions. Includes a custom Lovelace card with live weather, an 8-hour rain forecast, and hourly outfit tips — in 5 languages.
+A **Home Assistant** custom integration that provides personalized clothing advice for outdoor **runners**, **walkers/hikers** and **cyclists**. It fetches real-time weather, air quality, and pollen data from the [Open-Meteo](https://open-meteo.com/) API and generates sport-specific layering recommendations adapted to your health conditions. Includes a custom Lovelace card with live weather, an 8-hour rain forecast, and hourly outfit tips — in 5 languages.
 
 ---
 
