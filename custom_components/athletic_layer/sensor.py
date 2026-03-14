@@ -437,6 +437,13 @@ class AthleticLayerSensor(CoordinatorEntity[AthleticLayerCoordinator], SensorEnt
         self.entity_description = description
         self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{description.key}"
 
+    # ── stable entity ID ────────────────────────────────────────
+
+    @property
+    def suggested_object_id(self) -> str | None:
+        """Force English-based entity IDs regardless of system language."""
+        return f"athletic_layer {self.entity_description.key}"
+
     # ── device info ─────────────────────────────────────────────
 
     @property
@@ -733,6 +740,11 @@ class AthleticLayerAdviceSensor(
         self._sport = entry.data.get(CONF_SPORT, "running")
         self._cached_language: str | None = None
         self._attr_name = self._build_display_name(DEFAULT_LANGUAGE)
+
+    @property
+    def suggested_object_id(self) -> str | None:
+        """Force English-based entity ID regardless of system language."""
+        return "athletic_layer clothing_advice"
 
     async def async_added_to_hass(self) -> None:
         """Register listeners for language changes."""
