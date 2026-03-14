@@ -256,10 +256,11 @@ class AthleticLayerCard extends HTMLElement {
     } else {
       this._update();
     }
-    // When the frontend language changes, tell the backend directly
-    // so advice regenerates in the new language without file-IO lag.
+    // Tell the backend the current frontend language so advice matches.
+    // Fire on initial load AND on any language change.
     const newLang = hass.language;
-    if (prevLang && newLang && prevLang !== newLang && this._config) {
+    if (newLang && this._config && (!this._langSent || (prevLang && prevLang !== newLang))) {
+      this._langSent = true;
       const lang = newLang.split("-")[0].toLowerCase();
       this._hass.callWS({
         type: "fire_event",
