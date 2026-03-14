@@ -789,7 +789,11 @@ class AthleticLayerAdviceSensor(
     def _async_on_frontend_language_changed(self, event: Event) -> None:
         """Handle language change reported by the Lovelace card."""
         lang = (event.data.get("language") or "")[:2].lower()
-        if lang in SUPPORTED_LANGUAGES and lang != self._cached_language:
+        if lang not in SUPPORTED_LANGUAGES:
+            return
+        # Persist within this HA session so _resolve_language picks it up.
+        self.hass.data.setdefault(DOMAIN, {})["frontend_language"] = lang
+        if lang != self._cached_language:
             _LOGGER.debug(
                 "Frontend language event: %s -> %s", self._cached_language, lang
             )
@@ -884,8 +888,13 @@ class AthleticLayerAdviceSensor(
         )
 
     def _resolve_language(self) -> str:
-        """Resolve advice language: user profile first, then system config."""
-        # 1) User-profile language (specific to the user who created this entry)
+        """Resolve advice language from the best available source."""
+        # 1) Language reported by the Lovelace card (most accurate)
+        fe_lang = self.hass.data.get(DOMAIN, {}).get("frontend_language")
+        if fe_lang and fe_lang in SUPPORTED_LANGUAGES:
+            return fe_lang
+
+        # 2) User-profile language from storage file
         try:
             storage_dir = self.hass.config.path(".storage")
             user_id = self._entry.data.get(CONF_USER_ID)
@@ -897,7 +906,7 @@ class AthleticLayerAdviceSensor(
         except Exception:
             pass
 
-        # 2) Fall back to HA system language
+        # 3) Fall back to HA system language
         sys_lang = self.hass.config.language
         if sys_lang:
             code = sys_lang[:2].lower()
