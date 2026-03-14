@@ -36,7 +36,7 @@ A **Home Assistant** custom integration that provides personalized clothing advi
 1. Copy the `AthleticLayer` folder into your Home Assistant `custom_components` directory:
 
    ```
-   <config>/custom_components/AthleticLayer/
+   <config>/custom_components/athletic_layer
    ```
 
 2. Restart Home Assistant.
@@ -93,7 +93,7 @@ A custom card is included to display all integration data in a single dashboard 
 1. Copy the card file to your `www` folder:
 
    ```bash
-   cp custom_components/AthleticLayer/www/athletic-layer-card.js www/
+   cp custom_components/Athletic_Layer/www/athletic-layer-card.js www/
    ```
 
 2. In Home Assistant, go to **Settings → Dashboards → Resources** → **Add Resource**:
