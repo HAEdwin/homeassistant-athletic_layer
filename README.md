@@ -10,7 +10,7 @@ A **Home Assistant** custom integration that provides personalized clothing advi
 ## Features
 
 - **Personalized clothing advice** — layered recommendations (base, mid, outer, bottoms, accessories) based on current and forecasted weather.
-- **Sport-specific intelligence** — separate advice profiles for running (higher body heat) and cycling (higher wind exposure).
+- **Sport-specific intelligence** — separate advice profiles for running (higher body heat), cycling (higher wind exposure), Walking and Hiking.
 - **Health-aware adjustments** — adapts to conditions like asthma, pollen allergy, cold/heat sensitivity, rheumatism, hyperhidrosis, sun sensitivity, cardiovascular issues, diabetes, and immunosuppression.
 - **30+ weather sensors** — temperature, feels-like, wind, humidity, UV, precipitation, cloud cover, sunrise/sunset, and more.
 - **Air quality & pollen** — European AQI, PM2.5, PM10, and 6 pollen types (grass, birch, alder, mugwort, olive, ragweed).
