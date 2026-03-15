@@ -1,5 +1,8 @@
 {
     "config": {
+        "abort": {
+            "already_configured": "Er is al een service voor deze zone geconfigureerd."
+        },
         "step": {
             "user": {
                 "title": "Athletic Layer",
@@ -18,7 +21,6 @@
                 "title": "Athletic Layer Opties",
                 "description": "Werk je sport- en gezondheidsvoorkeuren bij.",
                 "data": {
-                    "zone": "Zone",
                     "sport": "Sport",
                     "health_conditions": "Gezondheidsaandoeningen"
                 }
