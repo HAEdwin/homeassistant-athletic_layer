@@ -38,6 +38,7 @@ A **Home Assistant** custom integration that provides personalized clothing advi
    ```
    <config>/custom_components/athletic_layer
    ```
+  
 
 2. Restart Home Assistant.
 
@@ -177,3 +178,5 @@ All weather and environmental data is sourced from the free [Open-Meteo API](htt
 ## License
 
 This project is provided as-is for personal, non-commercial use.
+
+<img src="https://github.com/HAEdwin/homeassistant-athletic_layer/blob/main/athleticlayercard.PNG?raw=true">
