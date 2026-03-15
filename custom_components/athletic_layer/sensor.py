@@ -37,6 +37,7 @@ from .const import (
     CONF_HEALTH_CONDITIONS,
     CONF_SPORT,
     CONF_USER_ID,
+    CONF_ZONE,
     DEFAULT_LANGUAGE,
     DOMAIN,
     SPORT_NAMES,
@@ -435,23 +436,26 @@ class AthleticLayerSensor(CoordinatorEntity[AthleticLayerCoordinator], SensorEnt
         """Initialize the sensor."""
         super().__init__(coordinator)
         self.entity_description = description
-        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{description.key}"
+        zone_entity_id = coordinator.config_entry.data.get(CONF_ZONE, "zone.home")
+        self._zone_slug = zone_entity_id.removeprefix("zone.")
+        self._attr_unique_id = f"{zone_entity_id}_{description.key}"
 
     # ── stable entity ID ────────────────────────────────────────
 
     @property
     def suggested_object_id(self) -> str | None:
-        """Force English-based entity IDs regardless of system language."""
-        return f"athletic_layer {self.entity_description.key}"
+        """Force English-based entity IDs with zone prefix."""
+        return f"{self._zone_slug} {self.entity_description.key}"
 
     # ── device info ─────────────────────────────────────────────
 
     @property
     def device_info(self) -> DeviceInfo:
-        """Group all sensors under a single device."""
+        """Group all sensors under a single device per zone."""
+        zone_entity_id = self.coordinator.config_entry.data.get(CONF_ZONE, "zone.home")
         return DeviceInfo(
-            identifiers={(DOMAIN, self.coordinator.config_entry.entry_id)},
-            name="Athletic Layer",
+            identifiers={(DOMAIN, zone_entity_id)},
+            name=f"Athletic Layer – {self.coordinator.location_name}",
             manufacturer="Open-Meteo",
             model="Weather & Air Quality",
             entry_type=DeviceEntryType.SERVICE,
@@ -736,15 +740,17 @@ class AthleticLayerAdviceSensor(
         """Initialize the advice sensor."""
         super().__init__(coordinator)
         self._entry = entry
-        self._attr_unique_id = f"{entry.entry_id}_clothing_advice"
+        zone_entity_id = entry.data.get(CONF_ZONE, "zone.home")
+        self._zone_slug = zone_entity_id.removeprefix("zone.")
+        self._attr_unique_id = f"{zone_entity_id}_clothing_advice"
         self._sport = entry.data.get(CONF_SPORT, "running")
         self._cached_language: str | None = None
         self._attr_name = self._build_display_name(DEFAULT_LANGUAGE)
 
     @property
     def suggested_object_id(self) -> str | None:
-        """Force English-based entity ID regardless of system language."""
-        return "athletic_layer clothing_advice"
+        """Force English-based entity ID with zone prefix."""
+        return f"{self._zone_slug} clothing_advice"
 
     async def async_added_to_hass(self) -> None:
         """Register listeners for language changes."""
@@ -830,9 +836,10 @@ class AthleticLayerAdviceSensor(
     @property
     def device_info(self) -> DeviceInfo:
         """Group under the same device as all other sensors."""
+        zone_entity_id = self.coordinator.config_entry.data.get(CONF_ZONE, "zone.home")
         return DeviceInfo(
-            identifiers={(DOMAIN, self.coordinator.config_entry.entry_id)},
-            name="Athletic Layer",
+            identifiers={(DOMAIN, zone_entity_id)},
+            name=f"Athletic Layer – {self.coordinator.location_name}",
             manufacturer="Open-Meteo",
             model="Weather & Air Quality",
             entry_type=DeviceEntryType.SERVICE,

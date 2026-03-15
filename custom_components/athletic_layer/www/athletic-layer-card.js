@@ -13,7 +13,7 @@
  * 3. Add the card to a dashboard (see README for YAML).
  */
 
-const CARD_VERSION = "1.0.0";
+const CARD_VERSION = "1.0.1";
 
 /* ── Weather-condition → MDI icon mapping ─────────────────────── */
 const CONDITION_ICONS = {
@@ -271,26 +271,30 @@ class AthleticLayerCard extends HTMLElement {
   }
 
   setConfig(config) {
-    if (!config.entity) {
-      throw new Error("Please define an 'entity' (the clothing_advice sensor).");
+    if (!config.zone && !config.entity) {
+      throw new Error("Please define a 'zone' (e.g. 'home') or an 'entity' (the clothing_advice sensor).");
     }
+    const zone = config.zone || null;
+    const entity = config.entity || (zone ? `sensor.${zone}_clothing_advice` : undefined);
+    const prefix = config.entity_prefix || (zone ? `sensor.${zone}_` : this._guessPrefix(entity));
     this._config = {
-      entity: config.entity,
+      zone: zone,
+      entity: entity,
       name: config.name || "Athletic Layer",
       show_hourly_advice: config.show_hourly_advice !== false,
       show_rain_chart: config.show_rain_chart !== false,
       show_air_quality: config.show_air_quality !== false,
       show_pollen: config.show_pollen !== false,
       show_weather_details: config.show_weather_details !== false,
-      entity_prefix: config.entity_prefix || this._guessPrefix(config.entity),
+      entity_prefix: prefix,
     };
     this._rendered = false;
   }
 
   _guessPrefix(entity) {
-    // "sensor.athletic_layer_clothing_advice" → "sensor.athletic_layer_"
+    // "sensor.home_clothing_advice" → "sensor.home_"
     const idx = entity.lastIndexOf("clothing_advice");
-    return idx > 0 ? entity.substring(0, idx) : "sensor.athletic_layer_";
+    return idx > 0 ? entity.substring(0, idx) : "sensor.home_";
   }
 
   _e(key) {
@@ -346,7 +350,7 @@ class AthleticLayerCard extends HTMLElement {
   }
 
   static getStubConfig() {
-    return { entity: "sensor.athletic_layer_clothing_advice" };
+    return { zone: "home" };
   }
 
   /* ── Initial render ──────────────────────────────────────── */
