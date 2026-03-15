@@ -32,6 +32,38 @@ from .const import (
 )
 
 
+def _build_options_schema(
+    sport_default: str = SPORT_RUNNING,
+    health_default: list[str] | None = None,
+) -> vol.Schema:
+    """Build the form schema for the options flow (zone is fixed after setup)."""
+    return vol.Schema(
+        {
+            vol.Required(CONF_SPORT, default=sport_default): SelectSelector(
+                SelectSelectorConfig(
+                    options=[
+                        {"value": s, "label": s.replace("_", " ").title()}
+                        for s in SPORTS
+                    ],
+                    mode=SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Optional(
+                CONF_HEALTH_CONDITIONS, default=health_default or []
+            ): SelectSelector(
+                SelectSelectorConfig(
+                    options=[
+                        {"value": c, "label": c.replace("_", " ").title()}
+                        for c in HEALTH_CONDITIONS
+                    ],
+                    multiple=True,
+                    mode=SelectSelectorMode.LIST,
+                )
+            ),
+        }
+    )
+
+
 def _build_schema(
     sport_default: str = SPORT_RUNNING,
     health_default: list[str] | None = None,
@@ -78,8 +110,13 @@ class AthleticLayerConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle the user step."""
         if user_input is not None:
-            # Use the zone's friendly name as the entry title
             zone_entity_id = user_input.get(CONF_ZONE, "zone.home")
+
+            # Prevent duplicate entries for the same zone
+            await self.async_set_unique_id(zone_entity_id)
+            self._abort_if_unique_id_configured()
+
+            # Use the zone's friendly name as the entry title
             zone_state = self.hass.states.get(zone_entity_id)
             zone_name = zone_state.name if zone_state else zone_entity_id
             title = f"Athletic Layer – {zone_name}"
@@ -116,7 +153,7 @@ class AthleticLayerOptionsFlow(OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Manage the options."""
+        """Manage the options (zone cannot be changed after setup)."""
         if user_input is not None:
             # Backfill user_id for entries created before it was stored
             merged = {**self._config_entry.data, **user_input}
@@ -130,9 +167,8 @@ class AthleticLayerOptionsFlow(OptionsFlow):
             )
             return self.async_create_entry(title="", data={})
 
-        schema = _build_schema(
+        schema = _build_options_schema(
             sport_default=self._config_entry.data.get(CONF_SPORT, SPORT_RUNNING),
             health_default=self._config_entry.data.get(CONF_HEALTH_CONDITIONS, []),
-            zone_default=self._config_entry.data.get(CONF_ZONE, "zone.home"),
         )
         return self.async_show_form(step_id="init", data_schema=schema)

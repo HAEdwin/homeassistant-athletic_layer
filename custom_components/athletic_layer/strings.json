@@ -1,5 +1,8 @@
 {
     "config": {
+        "abort": {
+            "already_configured": "A service for this zone is already configured."
+        },
         "step": {
             "user": {
                 "title": "Athletic Layer",
@@ -18,7 +21,6 @@
                 "title": "Athletic Layer Options",
                 "description": "Update your sport and health preferences.",
                 "data": {
-                    "zone": "Zone",
                     "sport": "Sport",
                     "health_conditions": "Health conditions"
                 }
