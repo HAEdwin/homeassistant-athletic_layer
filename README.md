@@ -52,10 +52,10 @@ A **Home Assistant** custom integration that provides personalized clothing advi
    | Field | Description |
    |-------|-------------|
    | **Zone** | A Home Assistant zone entity (e.g. `zone.home`) — used for location coordinates. |
-   | **Sport** | `Running` or `Cycling` — adjusts advice for body heat and wind exposure. |
+   | **Sport** | `Running`, `Cycling` or ... — adjusts advice for body heat and wind exposure. |
    | **Health conditions** | Optional — select any that apply to receive tailored warnings and adjustments. |
 
-4. The integration will immediately start polling weather and air quality data (every 10 minutes).
+4. The integration will immediately start polling weather and air quality data (updates every 10 minutes).
 
 You can reconfigure sport and health settings at any time via **Settings → Devices & Services → Athletic Layer → Configure**.
 
@@ -109,14 +109,14 @@ A custom card is included to display all integration data in a single dashboard 
 
 ```yaml
 type: custom:athletic-layer-card
-entity: sensor.athletic_layer_zone_zone_clothing_advice
+entity: sensor.athletic_layer_`zone`_`zone`_clothing_advice
 ```
 
 ### Full card configuration
 
 ```yaml
 type: custom:athletic-layer-card
-entity: sensor.athletic_layer_zone_zone_clothing_advice
+entity: sensor.athletic_layer_`zone`_`zone`_clothing_advice
 name: Athletic Layer           # Card title (default: "Athletic Layer")
 show_weather_details: true     # Weather grid (default: true)
 show_rain_chart: true          # 8-hour rain bar chart (default: true)
@@ -132,7 +132,7 @@ sensor entities will be shown automatically when typing. for example:
 
 ```yaml
 type: custom:athletic-layer-card
-entity: sensor.athletic_layer_zone2_zone2_clothing_advice
+entity: sensor.athletic_layer_`zone2`_`zone2`_clothing_advice
 ```
 
 ---
