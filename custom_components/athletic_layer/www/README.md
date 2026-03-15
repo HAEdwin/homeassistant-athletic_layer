@@ -45,16 +45,21 @@ A custom Lovelace card for the **Athletic Layer** integration, displaying real-t
 
 ### Minimal YAML
 
+Just set the `zone` to the name of the HA zone you configured in the integration:
+
 ```yaml
 type: custom:athletic-layer-card
-entity: sensor.athletic_layer_clothing_advice
+zone: home
 ```
+
+This automatically finds all sensors for that zone (e.g. `sensor.home_temperature`,
+`sensor.home_clothing_advice`, etc.).
 
 ### Full configuration
 
 ```yaml
 type: custom:athletic-layer-card
-entity: sensor.athletic_layer_clothing_advice
+zone: home                     # Zone slug matching your HA zone (e.g. "home", "work")
 name: Athletic Layer           # Card title (default: "Athletic Layer")
 show_weather_details: true     # Weather grid with wind, UV, etc. (default: true)
 show_rain_chart: true          # 8-hour rain bar chart (default: true)
@@ -63,16 +68,36 @@ show_pollen: true              # Pollen chips inside AQ section (default: true)
 show_hourly_advice: true       # Scrollable hourly advice cards (default: true)
 ```
 
-### Multiple instances
+### Multiple zones
 
-If you have more than one Athletic Layer config entry (e.g. different zones), the
-entity prefix is auto-detected from the `entity` you provide. You can also set it
-explicitly:
+Add one card per zone:
 
 ```yaml
 type: custom:athletic-layer-card
-entity: sensor.athletic_layer_2_clothing_advice
-entity_prefix: sensor.athletic_layer_2_
+zone: home
+```
+
+```yaml
+type: custom:athletic-layer-card
+zone: work
+```
+
+### Advanced: explicit entity
+
+Instead of `zone`, you can point directly to the clothing advice entity. The card
+derives the prefix from the entity name automatically:
+
+```yaml
+type: custom:athletic-layer-card
+entity: sensor.home_clothing_advice
+```
+
+You can also override the prefix manually if needed:
+
+```yaml
+type: custom:athletic-layer-card
+entity: sensor.home_clothing_advice
+entity_prefix: sensor.home_
 ```
 
 ## Card sections
