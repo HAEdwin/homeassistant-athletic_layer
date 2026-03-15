@@ -194,7 +194,7 @@ The recommendations are not generated via AI but based on algorithms.
 >
 > The clothing advice provided by this home assistant integration is intended for general informational purposes only. While efforts are made to offer accurate suggestions, the integration cannot take into account individual health or safety factors.
 >
-> The developers, administrators, or any other parties involved cannot be held liable for any direct or indirect damages, including physical injury, that may result from following the clothing advice provided. Use of this advice is entirely at your own risk.
+> The developers, administrators, or any other parties involved cannot be held liable for any direct or indirect damages, including physical injury, that may result from following the advice provided. Use of this advice is entirely at your own risk.
 >
 > By following this advice, you acknowledge that you do so at your own responsibility and that no guarantee is made regarding safety, comfort, or suitability for specific circumstances.
 
