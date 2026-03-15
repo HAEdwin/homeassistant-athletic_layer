@@ -21,6 +21,9 @@ A **Home Assistant** custom integration that provides personalized clothing advi
 - **Multi-language** — English, Dutch, German, French, and Spanish.
 - **Custom Lovelace card** — a polished card displaying all data at a glance.
 
+> [!NOTE]
+> Feel free to submit a feature request.
+
 ---
 
 ## Installation
@@ -62,6 +65,9 @@ A **Home Assistant** custom integration that provides personalized clothing advi
 
 You can reconfigure sport and health settings at any time via **Settings → Devices & Services → Athletic Layer → Configure**.
 
+> [!NOTE]
+> Feel free to submit a support ticket when needed. Help me to help you by being specific about the issue.
+
 ---
 
 ## Sensors created
@@ -90,6 +96,7 @@ The integration creates a device with the following sensors:
 ## Lovelace Card
 
 A custom card is included to display all integration data in a single dashboard card.
+For each predefined zone in Home Assistant you are able to create a lovelace card.
 
 ### Card installation
 
@@ -138,6 +145,9 @@ type: custom:athletic-layer-card
 entity: sensor.athletic_layer_`zone2`_`zone2`_clothing_advice
 ```
 
+> [!NOTE]
+> Feel free to submit a support ticket when needed. Help me to help you by being specific about the issue.
+
 ---
 
 ## Supported health conditions
@@ -174,6 +184,17 @@ The integration and card automatically use the language configured in your Home 
 ## Data sources
 
 All weather and environmental data is sourced from the free [Open-Meteo API](https://open-meteo.com/) — no API key required.
+
+---
+
+> [!WARNING]
+> ## Disclaimer
+>
+> The clothing advice provided by this home assistant integration is intended for general informational purposes only. While efforts are made to offer accurate suggestions, the integration cannot take into account individual health or safety factors.
+>
+> The developers, administrators, or any other parties involved cannot be held liable for any direct or indirect damages, including physical injury, that may result from following the clothing advice provided. Use of this advice is entirely at your own risk.
+>
+> By following this advice, you acknowledge that you do so at your own responsibility and that no guarantee is made regarding safety, comfort, or suitability for specific circumstances.
 
 ---
 
