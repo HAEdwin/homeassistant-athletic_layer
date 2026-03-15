@@ -7,6 +7,9 @@
 
 A **Home Assistant** custom integration that provides personalized clothing advice for outdoor **runners**, **walkers/hikers** and **cyclists**. It fetches real-time weather, air quality, and pollen data from the [Open-Meteo](https://open-meteo.com/) API and generates sport-specific layering recommendations adapted to your health conditions. Includes a custom Lovelace card with live weather, an 8-hour rain forecast, and hourly outfit tips — in 5 languages.
 
+If you enjoy using this integration, a ⭐ star or a small donation via **Buy Me a Coffee** would mean a lot!
+Your support keeps me motivated to improve and develop even more features. Thank you for helping me make this better!
+
 ---
 
 ## Features
