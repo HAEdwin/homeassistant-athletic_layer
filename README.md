@@ -109,14 +109,14 @@ A custom card is included to display all integration data in a single dashboard 
 
 ```yaml
 type: custom:athletic-layer-card
-entity: sensor.athletic_layer_clothing_advice
+entity: sensor.athletic_layer_zone_zone_clothing_advice
 ```
 
 ### Full card configuration
 
 ```yaml
 type: custom:athletic-layer-card
-entity: sensor.athletic_layer_clothing_advice
+entity: sensor.athletic_layer_zone_zone_clothing_advice
 name: Athletic Layer           # Card title (default: "Athletic Layer")
 show_weather_details: true     # Weather grid (default: true)
 show_rain_chart: true          # 8-hour rain bar chart (default: true)
@@ -127,12 +127,12 @@ show_hourly_advice: true       # Hourly advice carousel (default: true)
 
 ### Multiple zones
 
-If you have more than one Athletic Layer config entry, set the entity prefix explicitly:
+If you have more than one Athletic Layer config entry, set the entity prefix explicitly.
+sensor entities will be shown automatically when typing. for example:
 
 ```yaml
 type: custom:athletic-layer-card
-entity: sensor.athletic_layer_2_clothing_advice
-entity_prefix: sensor.athletic_layer_2_
+entity: sensor.athletic_layer_zone2_zone2_clothing_advice
 ```
 
 ---
