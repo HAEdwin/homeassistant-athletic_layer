@@ -1,9 +1,8 @@
-# Athletic Layer
+# <img src="https://github.com/HAEdwin/homeassistant-athletic_layer/blob/main/athleticlayerlogo.png?raw=true" width="15%">
 
 [![hacs_badge](https://img.shields.io/github/v/release/haedwin/homeassistant-athletic_layer)](https://github.com/haedwin/homeassistant-athletic_layer)
 [![hacs_badge](https://img.shields.io/maintenance/yes/2026)](https://github.com/haedwin/homeassistant-athletic_layer)
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange)]()
-
 
 A **Home Assistant** custom integration that provides personalized clothing advice for outdoor **runners**, **walkers/hikers** and **cyclists**. It fetches real-time weather, air quality, and pollen data (Europe only) from the [Open-Meteo](https://open-meteo.com/) API and generates sport-specific layering recommendations adapted to your health conditions. Includes a custom Lovelace card with live weather, an 8-hour rain forecast, and hourly outfit tips — in 5 languages.
 
