@@ -387,19 +387,178 @@ class AthleticLayerCard extends HTMLElement {
     const c = this._config;
     const $ = (id) => this._card.querySelector(`#${id}`);
 
-    // Preserve scroll position of .al-hourly-scroll if it exists
-    let hourlyScrollEl = null;
-    let hourlyScrollLeft = 0;
-    if (c.show_hourly_advice) {
-      hourlyScrollEl = this._card.querySelector('.al-hourly-scroll');
-      if (hourlyScrollEl) {
-        hourlyScrollLeft = hourlyScrollEl.scrollLeft;
-      }
+    /* ── Header ─────────────────────────────────────────────── */
+    const condition = entityState(h, this._e("weather_condition"));
+    const condIcon = CONDITION_ICONS[condition] || "mdi:weather-cloudy";
+    const condLabel = this._tc(condition);
+    const temp = entityNumeric(h, this._e("temperature"));
+    const feelsLike = entityNumeric(h, this._e("feels_like_temperature"));
+    const location = entityAttr(h, c.entity, "location") || "";
+
+    $("al-header").innerHTML = `
+      <div class="al-header-row">
+        <div class="al-header-left">
+          <ha-icon icon="${condIcon}" class="al-cond-icon"></ha-icon>
+          <div class="al-header-temp">
+            <span class="al-temp">${temp != null ? temp.toFixed(1) + "°" : "—"}</span>
+            <span class="al-feels-like">${feelsLike != null ? this._t("feels") + " " + feelsLike.toFixed(1) + "°" : ""}</span>
+          </div>
+        </div>
+        <div class="al-header-right">
+          <span class="al-title">${c.name}</span>
+          <span class="al-condition">${condLabel}</span>
+          ${location ? `<span class="al-location">${this._esc(location)}</span>` : ""}
+        </div>
+      </div>`;
+
+    /* ── Weather details grid ──────────────────────────────── */
+    if (c.show_weather_details) {
+      const wind = entityNumeric(h, this._e("wind_speed"));
+      const gusts = entityNumeric(h, this._e("wind_gusts"));
+      const dir = entityState(h, this._e("wind_direction"));
+      const hum = entityNumeric(h, this._e("humidity"));
+      const uv = entityNumeric(h, this._e("uv_index"));
+      const precip = entityNumeric(h, this._e("precipitation"));
+      const precipP = entityNumeric(h, this._e("precipitation_probability"));
+      const cloud = entityNumeric(h, this._e("cloud_cover"));
+      const sunrise = entityState(h, this._e("sunrise"));
+      const sunset = entityState(h, this._e("sunset"));
+      const windUnit = entityAttr(h, this._e("wind_speed"), "unit_of_measurement") || "km/h";
+      const precipUnit = entityAttr(h, this._e("precipitation"), "unit_of_measurement") || "mm";
+
+      $("al-weather").innerHTML = `
+        ${this._weatherTile("mdi:weather-windy", this._t("tile_wind"), wind != null ? `${wind.toFixed(0)} ${windUnit} ${this._twd(dir)}` : "—")}
+        ${this._weatherTile("mdi:weather-windy-variant", this._t("tile_gusts"), gusts != null ? `${gusts.toFixed(0)} ${windUnit}` : "—")}
+        ${this._weatherTile("mdi:water-percent", this._t("tile_humidity"), hum != null ? `${hum}%` : "—")}
+        ${this._weatherTile("mdi:sun-wireless", this._t("tile_uv"), uv != null ? uv.toFixed(1) : "—")}
+        ${this._weatherTile("mdi:weather-rainy", this._t("tile_rain"), precip != null ? `${precip.toFixed(1)} ${precipUnit}` : "—")}
+        ${this._weatherTile("mdi:cloud-percent-outline", this._t("tile_rain_prob"), precipP != null ? `${precipP}%` : "—")}
+        ${this._weatherTile("mdi:cloud", this._t("tile_clouds"), cloud != null ? `${cloud}%` : "—")}
+        ${this._weatherTile("mdi:weather-sunset-up", this._t("tile_sunrise"), sunrise && sunrise !== "unknown" ? sunrise : "—")}
+        ${this._weatherTile("mdi:weather-sunset-down", this._t("tile_sunset"), sunset && sunset !== "unknown" ? sunset : "—")}
+      `;
+    } else {
+      $("al-weather").innerHTML = "";
     }
 
-    /* ...existing code... */
+    /* ── Advice text ───────────────────────────────────────── */
+    const adviceState = entityState(h, c.entity);
+    const detailed = entityAttr(h, c.entity, "detailed_advice");
+    const generated = entityAttr(h, c.entity, "generated_at");
+    const sport = entityAttr(h, c.entity, "sport") || "";
+    const sportLabel = sport ? (this._i18n().sports[sport] || CARD_I18N.en.sports[sport] || sport.replace("_", " ")) : "";
 
-    // ...existing code for all sections...
+    $('al-advice-section').innerHTML = (detailed || adviceState)
+      ? `<div class="al-sect-title"><ha-icon icon="mdi:tshirt-crew"></ha-icon> ${this._t('sect_clothing')}${sportLabel ? ` <span class="al-sport-badge">${this._esc(sportLabel)}</span>` : ''}</div>
+         <div class="al-advice-text">${this._esc(detailed || adviceState)}</div>
+         ${generated ? `<div class="al-generated-at">${this._t('updated')} ${this._esc(generated)}</div>` : ''}`
+      : "";
+
+    /* ── Layer breakdown ───────────────────────────────────── */
+    const layers = entityAttr(h, c.entity, "layers");
+    if (layers && typeof layers === "object") {
+      const items = Object.entries(layers)
+        .filter(([, v]) => v && v !== "none")
+        .map(
+          ([k, v]) => `
+          <div class="al-layer-row">
+            <ha-icon icon="${LAYER_ICONS[k] || "mdi:hanger"}" class="al-layer-icon"></ha-icon>
+            <span class="al-layer-label">${this._t("layer_" + k) || this._capitalize(k)}</span>
+            <span class="al-layer-value">${this._esc(this._formatLayerValue(v))}</span>
+          </div>`
+        )
+        .join("");
+      $("al-layers-section").innerHTML = items
+        ? `<div class="al-sect-title"><ha-icon icon="mdi:layers-triple"></ha-icon> ${this._t("sect_layers")}</div>${items}`
+        : "";
+    } else {
+      $("al-layers-section").innerHTML = "";
+    }
+
+    /* ── Warnings & health ─────────────────────────────────── */
+    const warnings = entityAttr(h, c.entity, "warnings") || [];
+    const healthAdj = entityAttr(h, c.entity, "health_adjustments") || [];
+    const allWarnings = [...warnings, ...healthAdj];
+    if (allWarnings.length) {
+      $("al-warnings-section").innerHTML = `
+        <div class="al-sect-title al-warn-title"><ha-icon icon="mdi:alert-outline"></ha-icon> ${this._t("sect_alerts")}</div>
+        ${allWarnings.map((w) => `<div class="al-warning">${this._esc(w)}</div>`).join("")}`;
+    } else {
+      $("al-warnings-section").innerHTML = "";
+    }
+
+    /* ── Rain forecast chart ───────────────────────────────── */
+    if (c.show_rain_chart) {
+      const forecast = entityAttr(h, this._e("rainfall_forecast_8h"), "hourly_forecast");
+      if (forecast && forecast.length) {
+        const maxRain = Math.max(...forecast.map((h) => h.rain_mm || 0), 0.5);
+        const bars = forecast
+          .map((hr) => {
+            const pct = ((hr.rain_mm || 0) / maxRain) * 100;
+            const time = hr.time ? hr.time.split("T").pop().substring(0, 5) : "";
+            return `
+            <div class="al-rain-col">
+              <span class="al-rain-val">${(hr.rain_mm || 0).toFixed(1)}</span>
+              <div class="al-rain-bar-bg"><div class="al-rain-bar" style="height:${pct}%"></div></div>
+              <span class="al-rain-prob">${hr.precipitation_probability ?? "—"}%</span>
+              <span class="al-rain-time">${time}</span>
+            </div>`;
+          })
+          .join("");
+        const total = entityNumeric(h, this._e("rainfall_forecast_8h"));
+        $("al-rain-section").innerHTML = `
+          <div class="al-sect-title"><ha-icon icon="mdi:weather-pouring"></ha-icon> ${this._t("sect_rain")}
+            <span class="al-rain-total">${total != null ? total.toFixed(1) + " " + this._t("mm_total") : ""}</span>
+          </div>
+          <div class="al-rain-chart">${bars}</div>`;
+      } else {
+        $("al-rain-section").innerHTML = "";
+      }
+    } else {
+      $("al-rain-section").innerHTML = "";
+    }
+
+    /* ── Air quality & pollen ──────────────────────────────── */
+    if (c.show_air_quality) {
+      const aqi = entityNumeric(h, this._e("air_quality_index"));
+      const pm25 = entityNumeric(h, this._e("pm25"));
+      const pm10 = entityNumeric(h, this._e("pm10"));
+
+      let pollenHtml = "";
+      if (c.show_pollen) {
+        const pollenKeys = ["pollen_grass", "pollen_birch", "pollen_alder", "pollen_mugwort", "pollen_olive", "pollen_ragweed"];
+        const pollenItems = pollenKeys
+          .map((k) => {
+            const v = entityNumeric(h, this._e(k));
+            return v != null && v > 0
+              ? `<span class="al-pollen-chip">${this._t(k)}: ${v}</span>`
+              : null;
+          })
+          .filter(Boolean)
+          .join("");
+        if (pollenItems) {
+          pollenHtml = `<div class="al-pollen-row">${pollenItems}</div>`;
+        }
+      }
+
+      if (aqi != null || pm25 != null || pm10 != null || pollenHtml) {
+        $("al-aq-section").innerHTML = `
+          <div class="al-sect-title"><ha-icon icon="mdi:air-filter"></ha-icon> ${this._t("sect_air_quality")}</div>
+          <div class="al-aq-row">
+            ${aqi != null ? `<div class="al-aq-badge" style="border-color:${aqiColor(aqi)}">
+              <span class="al-aq-val" style="color:${aqiColor(aqi)}">${aqi}</span>
+              <span class="al-aq-label">${this._taqi(aqi)}</span>
+            </div>` : ""}
+            ${pm25 != null ? this._aqTile("PM2.5", pm25.toFixed(1), "µg/m³") : ""}
+            ${pm10 != null ? this._aqTile("PM10", pm10.toFixed(1), "µg/m³") : ""}
+          </div>
+          ${pollenHtml}`;
+      } else {
+        $("al-aq-section").innerHTML = "";
+      }
+    } else {
+      $("al-aq-section").innerHTML = "";
+    }
 
     /* ── Hourly advice scroll ──────────────────────────────── */
     if (c.show_hourly_advice) {
@@ -435,17 +594,6 @@ class AthleticLayerCard extends HTMLElement {
       }
     } else {
       $("al-hourly-section").innerHTML = "";
-    }
-
-    // Restore scroll position of .al-hourly-scroll if it existed
-    if (c.show_hourly_advice && hourlyScrollEl) {
-      // Wait for the DOM to update
-      setTimeout(() => {
-        const newScrollEl = this._card.querySelector('.al-hourly-scroll');
-        if (newScrollEl) {
-          newScrollEl.scrollLeft = hourlyScrollLeft;
-        }
-      }, 0);
     }
   }
 
