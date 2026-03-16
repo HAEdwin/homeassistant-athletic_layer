@@ -948,10 +948,19 @@ class AthleticLayerAdviceSensor(
             if i >= len(times):
                 break
             ws = _build_weather_slice_hourly(data, i)
+            # Parse the forecast time string to a datetime object if possible
+            forecast_time = times[i]
+            forecast_dt = None
+            try:
+                # Handles ISO8601 with or without timezone
+                forecast_dt = datetime.fromisoformat(forecast_time.replace("Z", "+00:00"))
+            except Exception:
+                forecast_dt = None
             ha = engine.generate(
                 ws,
                 location=self.coordinator.location_name,
                 timezone=self.coordinator.timezone,
+                generated_at=forecast_dt,
             )
             ha.time = times[i]
             result.append(
