@@ -20,7 +20,7 @@ const CONDITION_ICONS = {
   clear_sky: "mdi:weather-sunny",
   mainly_clear: "mdi:weather-sunny",
   partly_cloudy: "mdi:weather-partly-cloudy",
-  overcast: "mdi:weather-cloudy",
+  overcast: "mdi:cloud",
   fog: "mdi:weather-fog",
   depositing_rime_fog: "mdi:weather-fog",
   light_drizzle: "mdi:weather-partly-rainy",
@@ -580,7 +580,7 @@ class AthleticLayerCard extends HTMLElement {
               } else if (cloud < 85) {
                 hIcon = CONDITION_ICONS["partly_cloudy"] || "mdi:weather-cloudy";
               } else {
-                hIcon = CONDITION_ICONS["overcast"] || "mdi:weather-cloudy";
+                hIcon = CONDITION_ICONS["overcast"] || "mdi:cloud";
               }
             } else {
               const hCode = hr.weather_condition || hr.weather_code;
