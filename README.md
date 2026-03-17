@@ -187,7 +187,7 @@ The integration and card automatically use the language configured in your Home 
 
 All weather and environmental data is sourced from the free [Open-Meteo API](https://open-meteo.com/) — no API key required.
 The selected medical profiles during the installation of this integration are stored locally only and are not shared with any source. 
-The recommendations are not generated via AI but based on algorithms.
+The recommendations are not generated via AI but based on local algorithms.
 
 ---
 
