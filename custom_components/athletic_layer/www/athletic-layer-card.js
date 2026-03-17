@@ -13,14 +13,14 @@
  * 3. Add the card to a dashboard (see README for YAML).
  */
 
-const CARD_VERSION = "1.0.1";
+const CARD_VERSION = "1.0.2";
 
 /* ── Weather-condition → MDI icon mapping ─────────────────────── */
 const CONDITION_ICONS = {
   clear_sky: "mdi:weather-sunny",
   mainly_clear: "mdi:weather-sunny",
   partly_cloudy: "mdi:weather-partly-cloudy",
-  overcast: "mdi:weather-cloudy",
+  overcast: "mdi:cloud",
   fog: "mdi:weather-fog",
   depositing_rime_fog: "mdi:weather-fog",
   light_drizzle: "mdi:weather-partly-rainy",
@@ -569,8 +569,23 @@ class AthleticLayerCard extends HTMLElement {
           .map((hr) => {
             const t = hr.time ? hr.time.split("T").pop().substring(0, 5) : "";
             const hTemp = hr.temperature != null ? `${Number(hr.temperature).toFixed(0)}°` : "";
-            const hCode = hr.weather_condition || hr.weather_code;
-            const hIcon = CONDITION_ICONS[hCode] || "mdi:weather-cloudy";
+            // Use cloud coverage for icon if available
+            let hIcon;
+            if (typeof hr.cloud_coverage === "number") {
+              const cloud = hr.cloud_coverage;
+              if (cloud < 20) {
+                hIcon = CONDITION_ICONS["clear_sky"] || "mdi:weather-sunny";
+              } else if (cloud < 50) {
+                hIcon = CONDITION_ICONS["mainly_clear"] || "mdi:weather-partly-cloudy";
+              } else if (cloud < 85) {
+                hIcon = CONDITION_ICONS["partly_cloudy"] || "mdi:weather-cloudy";
+              } else {
+                hIcon = CONDITION_ICONS["overcast"] || "mdi:cloud";
+              }
+            } else {
+              const hCode = hr.weather_condition || hr.weather_code;
+              hIcon = CONDITION_ICONS[hCode] || "mdi:weather-cloudy";
+            }
             const summary = hr.summary || hr.short_summary || "";
             const hLayers = hr.layers || {};
             const layerLine = Object.entries(hLayers)

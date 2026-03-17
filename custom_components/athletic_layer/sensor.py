@@ -950,15 +950,12 @@ class AthleticLayerAdviceSensor(
             ws = _build_weather_slice_hourly(data, i)
             # Parse the forecast time string to a datetime object if possible
             forecast_time = times[i]
-            forecast_dt: datetime | None = None
-            if isinstance(forecast_time, str):
-                try:
-                    # Handles ISO8601 with or without timezone
-                    forecast_dt = datetime.fromisoformat(
-                        forecast_time.replace("Z", "+00:00")
-                    )
-                except ValueError:
-                    forecast_dt = None
+            forecast_dt = None
+            try:
+                # Handles ISO8601 with or without timezone
+                forecast_dt = datetime.fromisoformat(forecast_time.replace("Z", "+00:00"))
+            except Exception:
+                forecast_dt = None
             ha = engine.generate(
                 ws,
                 location=self.coordinator.location_name,
@@ -966,6 +963,16 @@ class AthleticLayerAdviceSensor(
                 generated_at=forecast_dt,
             )
             ha.time = times[i]
+            # Add cloud_coverage for frontend icon logic
+            cloud_coverage = None
+            if hasattr(ws, "cloud_cover"):
+                cloud_coverage = ws.cloud_cover
+            # Add weather_condition for icon mapping in frontend
+            weather_condition = None
+            if hasattr(ws, "weather_code") and ws.weather_code is not None:
+                # Map WMO code to string key (same as current weather sensor)
+                from .const import WMO_CODES
+                weather_condition = WMO_CODES.get(int(ws.weather_code), f"unknown_{ws.weather_code}")
             result.append(
                 {
                     "time": ha.time,
@@ -973,6 +980,8 @@ class AthleticLayerAdviceSensor(
                     "detailed_advice": ha.detailed_advice,
                     "layers": ha.layers,
                     "warnings": ha.warnings,
+                    "cloud_coverage": cloud_coverage,
+                    "weather_condition": weather_condition,
                 }
             )
         return result
