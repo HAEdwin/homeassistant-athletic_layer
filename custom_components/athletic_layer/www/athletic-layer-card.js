@@ -576,9 +576,9 @@ class AthleticLayerCard extends HTMLElement {
               if (cloud < 20) {
                 hIcon = CONDITION_ICONS["clear_sky"] || "mdi:weather-sunny";
               } else if (cloud < 50) {
-                hIcon = CONDITION_ICONS["partly_cloudy"] || "mdi:weather-partly-cloudy";
+                hIcon = CONDITION_ICONS["mainly_clear"] || "mdi:weather-partly-cloudy";
               } else if (cloud < 85) {
-                hIcon = CONDITION_ICONS["mainly_clear"] || "mdi:weather-sunny";
+                hIcon = CONDITION_ICONS["partly_cloudy"] || "mdi:weather-cloudy";
               } else {
                 hIcon = CONDITION_ICONS["overcast"] || "mdi:weather-cloudy";
               }
