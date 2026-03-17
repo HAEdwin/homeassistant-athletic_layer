@@ -24,7 +24,7 @@ Your support keeps me motivated to improve and develop even more features. Thank
 - **Custom Lovelace card** — a polished card displaying all data at a glance.
 
 > [!NOTE]
-> Feel free to submit a feature request.
+> Feel free to submit a feature request or bug report
 
 ---
 
