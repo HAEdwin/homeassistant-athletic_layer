@@ -967,6 +967,12 @@ class AthleticLayerAdviceSensor(
             cloud_coverage = None
             if hasattr(ws, "cloud_cover"):
                 cloud_coverage = ws.cloud_cover
+            # Add weather_condition for icon mapping in frontend
+            weather_condition = None
+            if hasattr(ws, "weather_code") and ws.weather_code is not None:
+                # Map WMO code to string key (same as current weather sensor)
+                from .const import WMO_CODES
+                weather_condition = WMO_CODES.get(int(ws.weather_code), f"unknown_{ws.weather_code}")
             result.append(
                 {
                     "time": ha.time,
@@ -975,6 +981,7 @@ class AthleticLayerAdviceSensor(
                     "layers": ha.layers,
                     "warnings": ha.warnings,
                     "cloud_coverage": cloud_coverage,
+                    "weather_condition": weather_condition,
                 }
             )
         return result
