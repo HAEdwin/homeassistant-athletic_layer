@@ -8,7 +8,7 @@
  * ────────────
  * 1. Copy this file to  <config>/www/athletic-layer-card.js
  * 2. In HA → Settings → Dashboards → Resources → Add Resource:
- *      URL:  /local/athletic-layer-card.js
+ *      URL:  /local/athletic-layer-card.js?v=1.0.3 (to prevent caching issues)
  *      Type: JavaScript Module
  * 3. Add the card to a dashboard (see README for YAML).
  */
