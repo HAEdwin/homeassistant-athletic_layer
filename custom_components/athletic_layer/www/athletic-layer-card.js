@@ -451,7 +451,7 @@ class AthleticLayerCard extends HTMLElement {
       const uv = entityNumeric(h, this._e("uv_index"));
       const precip = entityNumeric(h, this._e("precipitation"));
       const precipP = entityNumeric(h, this._e("precipitation_probability"));
-      const cloud = entityNumeric(h, this._e("cloud_cover_low"));
+      const cloud = entityNumeric(h, this._e("cloud_cover_perceived"));
       const sunrise = entityState(h, this._e("sunrise"));
       const sunset = entityState(h, this._e("sunset"));
       const windUnit = entityAttr(h, this._e("wind_speed"), "unit_of_measurement") || "km/h";
