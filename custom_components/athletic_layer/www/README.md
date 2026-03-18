@@ -37,10 +37,10 @@ A custom Lovelace card for the **Athletic Layer** integration, displaying real-t
    | URL   | `/local/athletic-layer-card.js?v=1.0.x` |
    | Type  | JavaScript Module |
 
-3. **Prevent caching** by adding `?v=1.0.x` where x is preferably the same version as indicated
-    in the source on line 16 `const CARD_VERSION = "1.0.3";` you are preventing the browser from caching the previous version of the card.
+3. **Prevent caching** by adding `?v=1.0.x` to the resource URL.  
+   Prefer using the same value as `CARD_VERSION` in `athletic-layer-card.js` (currently `1.0.3`) to avoid stale browser cache.
 
-5. **Add the card** to a dashboard.
+4. **Add the card** to a dashboard.
 
 ## Usage
 
