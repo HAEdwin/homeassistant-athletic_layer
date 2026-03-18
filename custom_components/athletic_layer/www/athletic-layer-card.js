@@ -8,12 +8,12 @@
  * ────────────
  * 1. Copy this file to  <config>/www/athletic-layer-card.js
  * 2. In HA → Settings → Dashboards → Resources → Add Resource:
- *      URL:  /local/athletic-layer-card.js?v=1.0.3 (to avoid caching issues)
+ *      URL:  /local/athletic-layer-card.js?v=1.0.4 (to avoid caching issues)
  *      Type: JavaScript Module
  * 3. Add the card to a dashboard (see README for YAML).
  */
 
-const CARD_VERSION = "1.0.3";
+const CARD_VERSION = "1.0.4";
 
 /* ── Weather-condition → MDI icon mapping ─────────────────────── */
 const CONDITION_ICONS = {
@@ -388,9 +388,30 @@ class AthleticLayerCard extends HTMLElement {
     const $ = (id) => this._card.querySelector(`#${id}`);
 
     /* ── Header ─────────────────────────────────────────────── */
-    const condition = entityState(h, this._e("weather_condition"));
-    const condIcon = CONDITION_ICONS[condition] || "mdi:weather-cloudy";
-    const condLabel = this._tc(condition);
+    // Use backend-provided cloud_cover for icon logic
+    let condIcon, condLabel;
+    // Use the new standalone perceived cloud cover sensor
+    const perceivedCloudEntity = (c.entity_prefix || "sensor.home_") + "cloud_cover_perceived";
+    const cloudCoverage = entityNumeric(h, perceivedCloudEntity);
+    if (typeof cloudCoverage === "number") {
+      if (cloudCoverage < 20) {
+        condIcon = CONDITION_ICONS["clear_sky"] || "mdi:weather-sunny";
+        condLabel = this._tc("clear_sky");
+      } else if (cloudCoverage < 50) {
+        condIcon = CONDITION_ICONS["mainly_clear"] || "mdi:weather-partly-cloudy";
+        condLabel = this._tc("mainly_clear");
+      } else if (cloudCoverage < 85) {
+        condIcon = CONDITION_ICONS["partly_cloudy"] || "mdi:weather-cloudy";
+        condLabel = this._tc("partly_cloudy");
+      } else {
+        condIcon = CONDITION_ICONS["overcast"] || "mdi:cloud";
+        condLabel = this._tc("overcast");
+      }
+    } else {
+      const condition = entityState(h, this._e("weather_condition"));
+      condIcon = CONDITION_ICONS[condition] || "mdi:weather-cloudy";
+      condLabel = this._tc(condition);
+    }
     const temp = entityNumeric(h, this._e("temperature"));
     const feelsLike = entityNumeric(h, this._e("feels_like_temperature"));
     const location = entityAttr(h, c.entity, "location") || "";
@@ -420,7 +441,7 @@ class AthleticLayerCard extends HTMLElement {
       const uv = entityNumeric(h, this._e("uv_index"));
       const precip = entityNumeric(h, this._e("precipitation"));
       const precipP = entityNumeric(h, this._e("precipitation_probability"));
-      const cloud = entityNumeric(h, this._e("cloud_cover"));
+      const cloud = entityNumeric(h, this._e("cloud_cover_low"));
       const sunrise = entityState(h, this._e("sunrise"));
       const sunset = entityState(h, this._e("sunset"));
       const windUnit = entityAttr(h, this._e("wind_speed"), "unit_of_measurement") || "km/h";
@@ -577,15 +598,15 @@ class AthleticLayerCard extends HTMLElement {
           .map((hr) => {
             const t = hr.time ? hr.time.split("T").pop().substring(0, 5) : "";
             const hTemp = hr.temperature != null ? `${Number(hr.temperature).toFixed(0)}°` : "";
-            // Use cloud coverage for icon if available
+            // Use backend-provided perceived_cloud for icon logic if available
             let hIcon;
-            if (typeof hr.cloud_coverage === "number") {
-              const cloud = hr.cloud_coverage;
-              if (cloud < 20) {
+            const perceivedCloud = typeof hr.perceived_cloud === "number" ? hr.perceived_cloud : hr.cloud_coverage;
+            if (typeof perceivedCloud === "number") {
+              if (perceivedCloud < 20) {
                 hIcon = CONDITION_ICONS["clear_sky"] || "mdi:weather-sunny";
-              } else if (cloud < 50) {
+              } else if (perceivedCloud < 50) {
                 hIcon = CONDITION_ICONS["mainly_clear"] || "mdi:weather-partly-cloudy";
-              } else if (cloud < 85) {
+              } else if (perceivedCloud < 85) {
                 hIcon = CONDITION_ICONS["partly_cloudy"] || "mdi:weather-cloudy";
               } else {
                 hIcon = CONDITION_ICONS["overcast"] || "mdi:cloud";
