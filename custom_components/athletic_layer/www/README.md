@@ -2,8 +2,6 @@
 
 A custom Lovelace card for the **Athletic Layer** integration, displaying real-time weather conditions and personalized clothing advice for athletes.
 
-![card preview](https://via.placeholder.com/400x600?text=Athletic+Layer+Card)
-
 ## Features
 
 - **Weather header** – current temperature, feels-like, condition icon
@@ -36,10 +34,13 @@ A custom Lovelace card for the **Athletic Layer** integration, displaying real-t
 
    | Field | Value |
    |-------|-------|
-   | URL   | `/local/athletic-layer-card.js` |
+   | URL   | `/local/athletic-layer-card.js?v=1.0.x` |
    | Type  | JavaScript Module |
 
-3. **Add the card** to a dashboard.
+3. **Prevent caching** by adding `?v=1.0.x` where x is preferably the same version as indicated
+    in the source on line 16 `const CARD_VERSION = "1.0.3";` you are preventing the browser from caching the previous version of the card.
+
+5. **Add the card** to a dashboard.
 
 ## Usage
 
