@@ -194,6 +194,18 @@ SENSOR_DESCRIPTIONS: tuple[AthleticLayerSensorDescription, ...] = (
         data_type="current",
         api_key="cloud_cover",
     ),
+    # ── Perceived cloud cover (standalone sensor) ──
+    AthleticLayerSensorDescription(
+        key="cloud_cover_perceived",
+        translation_key="cloud_cover_perceived",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
+        icon="mdi:cloud-percent",
+        source="weather",
+        data_type="current",
+        api_key="cloud_cover_perceived",
+    ),
     AthleticLayerSensorDescription(
         key="precipitation",
         translation_key="precipitation",
@@ -499,6 +511,10 @@ class AthleticLayerSensor(CoordinatorEntity[AthleticLayerCoordinator], SensorEnt
             return None
 
         if desc.data_type == "current":
+            # Special handling for perceived cloud cover
+            if desc.key == "cloud_cover_perceived":
+                current = source_data.get("current", {})
+                return compute_perceived_cloud_cover(current)
             value = source_data.get("current", {}).get(desc.api_key)
         elif desc.data_type == "hourly":
             hourly = source_data.get("hourly", {})
@@ -561,8 +577,19 @@ class AthleticLayerSensor(CoordinatorEntity[AthleticLayerCoordinator], SensorEnt
         return None
 
 
-# ── Helper ──────────────────────────────────────────────────────────
+# ── Helpers ─────────────────────────────────────────────────────────
 
+def compute_perceived_cloud_cover(data: dict[str, Any]) -> float | None:
+    """Compute weighted perceived cloud cover, clamped to 100%."""
+    ccl = data.get("cloud_cover_low")
+    ccm = data.get("cloud_cover_mid")
+    cch = data.get("cloud_cover_high")
+    if all(isinstance(x, (int, float)) for x in (ccl, ccm, cch)):
+        val = 1.0 * ccl + 0.6 * ccm + 0.2 * cch
+        return min(val, 100)
+    elif isinstance(ccl, (int, float)):
+        return min(ccl, 100)
+    return None
 
 def _read_user_language(storage_dir: str, user_id: str | None = None) -> str | None:
     """Read a user's language from HA frontend storage files."""
@@ -639,6 +666,9 @@ def _build_weather_slice_current(data: dict[str, Any]) -> WeatherSlice:
     sunrise_str = sunrise_list[0] if sunrise_list else None
     sunset_str = sunset_list[0] if sunset_list else None
 
+    # Compute perceived_cloud from low, mid, high using shared helper
+    perceived_cloud = compute_perceived_cloud_cover(current_w)
+
     return WeatherSlice(
         temperature=current_w.get("temperature_2m"),
         feels_like=current_w.get("apparent_temperature"),
@@ -648,7 +678,7 @@ def _build_weather_slice_current(data: dict[str, Any]) -> WeatherSlice:
         precipitation_mm=current_w.get("precipitation"),
         precipitation_probability=_safe_idx(hourly_w, "precipitation_probability", idx),
         uv_index=_safe_idx(hourly_w, "uv_index", idx),
-        cloud_cover=current_w.get("cloud_cover"),
+        cloud_cover=perceived_cloud,
         weather_code=current_w.get("weather_code"),
         dew_point=_safe_idx(hourly_w, "dew_point_2m", idx),
         pressure=current_w.get("pressure_msl"),
@@ -685,6 +715,12 @@ def _build_weather_slice_hourly(data: dict[str, Any], hour_index: int) -> Weathe
                 sunset_str = sunset_list[d_idx] if d_idx < len(sunset_list) else None
                 break
 
+    # Compute perceived_cloud from low, mid, high using shared helper
+    perceived_cloud = compute_perceived_cloud_cover({
+        "cloud_cover_low": _safe_idx(hourly_w, "cloud_cover_low", hour_index),
+        "cloud_cover_mid": _safe_idx(hourly_w, "cloud_cover_mid", hour_index),
+        "cloud_cover_high": _safe_idx(hourly_w, "cloud_cover_high", hour_index),
+    })
     return WeatherSlice(
         temperature=_safe_idx(hourly_w, "temperature_2m", hour_index),
         feels_like=_safe_idx(hourly_w, "apparent_temperature", hour_index),
@@ -696,7 +732,7 @@ def _build_weather_slice_hourly(data: dict[str, Any], hour_index: int) -> Weathe
             hourly_w, "precipitation_probability", hour_index
         ),
         uv_index=_safe_idx(hourly_w, "uv_index", hour_index),
-        cloud_cover=_safe_idx(hourly_w, "cloud_cover", hour_index),
+        cloud_cover=perceived_cloud,
         weather_code=_safe_idx(hourly_w, "weather_code", hour_index),
         dew_point=_safe_idx(hourly_w, "dew_point_2m", hour_index),
         pressure=_safe_idx(hourly_w, "pressure_msl", hour_index),
