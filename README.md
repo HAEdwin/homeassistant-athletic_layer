@@ -105,7 +105,7 @@ For each predefined zone in Home Assistant you are able to create a lovelace car
 1. Copy the card file to your `www` folder:
 
    ```bash
-   cp custom_components/Athletic_Layer/www/athletic-layer-card.js www/
+   cp /homeassistant/custom_components/AthleticLayer/www/athletic-layer-card.js /homeassistant/www/
    ```
 
 2. In Home Assistant, go to **Settings → Dashboards → Resources** → **Add Resource**:
