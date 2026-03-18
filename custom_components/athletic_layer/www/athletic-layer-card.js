@@ -8,12 +8,12 @@
  * ────────────
  * 1. Copy this file to  <config>/www/athletic-layer-card.js
  * 2. In HA → Settings → Dashboards → Resources → Add Resource:
- *      URL:  /local/athletic-layer-card.js
+ *      URL:  /local/athletic-layer-card.js?v=1.0.3 (to avoid caching issues)
  *      Type: JavaScript Module
  * 3. Add the card to a dashboard (see README for YAML).
  */
 
-const CARD_VERSION = "1.0.2";
+const CARD_VERSION = "1.0.3";
 
 /* ── Weather-condition → MDI icon mapping ─────────────────────── */
 const CONDITION_ICONS = {
@@ -564,6 +564,14 @@ class AthleticLayerCard extends HTMLElement {
     if (c.show_hourly_advice) {
       const hourly = entityAttr(h, c.entity, "advice_hourly");
       if (hourly && hourly.length > 1) {
+        // Preserve scroll position when re-rendering hourly advice (e.g. when weather details update). This is a bit hacky since we're replacing the entire scroll container, but it works and prevents the scroll from jumping back to the start on every update.
+        let scrollLeft = 0;
+        const hourlySection = $("al-hourly-section");
+        const prevScroll = hourlySection.querySelector('.al-hourly-scroll');
+        if (prevScroll) {
+          scrollLeft = prevScroll.scrollLeft;
+        }
+
         const cards = hourly
           .slice(1) // skip "now" — it's shown above
           .map((hr) => {
@@ -601,9 +609,15 @@ class AthleticLayerCard extends HTMLElement {
             </div>`;
           })
           .join("");
-        $("al-hourly-section").innerHTML = `
+        hourlySection.innerHTML = `
           <div class="al-sect-title"><ha-icon icon="mdi:clock-outline"></ha-icon> ${this._t("sect_hourly")}</div>
           <div class="al-hourly-scroll">${cards}</div>`;
+
+        // Restore scroll position
+        const newScroll = hourlySection.querySelector('.al-hourly-scroll');
+        if (newScroll) {
+          newScroll.scrollLeft = scrollLeft;
+        }
       } else {
         $("al-hourly-section").innerHTML = "";
       }
