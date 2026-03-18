@@ -511,8 +511,8 @@ class AthleticLayerSensor(CoordinatorEntity[AthleticLayerCoordinator], SensorEnt
             return None
 
         if desc.data_type == "current":
-            # Special handling for perceived cloud cover
-            if desc.key == "cloud_cover_perceived":
+            # Special handling for perceived and legacy cloud cover
+            if desc.key in ("cloud_cover_perceived", "cloud_cover"):
                 current = source_data.get("current", {})
                 return compute_perceived_cloud_cover(current)
             value = source_data.get("current", {}).get(desc.api_key)
