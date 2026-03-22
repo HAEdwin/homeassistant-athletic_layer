@@ -8,12 +8,12 @@
  * ────────────
  * 1. Copy this file to  <config>/www/athletic-layer-card.js
  * 2. In HA → Settings → Dashboards → Resources → Add Resource:
- *      URL:  /local/athletic-layer-card.js?v=1.0.4 (to avoid caching issues)
+ *      URL:  /local/athletic-layer-card.js?v=1.0.5 (to avoid caching issues)
  *      Type: JavaScript Module
  * 3. Add the card to a dashboard (see README for YAML).
  */
 
-const CARD_VERSION = "1.0.4";
+const CARD_VERSION = "1.0.5";
 
 /* ── Weather-condition → MDI icon mapping ─────────────────────── */
 const CONDITION_ICONS = {
@@ -46,6 +46,15 @@ const CONDITION_ICONS = {
   thunderstorm_slight_hail: "mdi:weather-lightning-rainy",
   thunderstorm_heavy_hail: "mdi:weather-lightning-rainy",
 };
+
+// List of non-cloud conditions (precipitation/visibility/thunder)
+const NON_CLOUD_CONDITIONS = [
+  "fog", "depositing_rime_fog", "light_drizzle", "moderate_drizzle", "dense_drizzle",
+  "light_freezing_drizzle", "dense_freezing_drizzle", "slight_rain", "moderate_rain", "heavy_rain",
+  "light_freezing_rain", "heavy_freezing_rain", "slight_snow_fall", "moderate_snow_fall", "heavy_snow_fall",
+  "snow_grains", "slight_rain_showers", "moderate_rain_showers", "violent_rain_showers",
+  "slight_snow_showers", "heavy_snow_showers", "thunderstorm", "thunderstorm_slight_hail", "thunderstorm_heavy_hail"
+];
 
 /* ── i18n: card UI translations ───────────────────────────────── */
 const CARD_I18N = {
@@ -393,14 +402,6 @@ class AthleticLayerCard extends HTMLElement {
     const perceivedCloudEntity = (c.entity_prefix || "sensor.home_") + "cloud_cover_perceived";
     const cloudCoverage = entityNumeric(h, perceivedCloudEntity);
     const condition = entityState(h, this._e("weather_condition"));
-    // List of non-cloud conditions (precipitation/visibility/thunder)
-    const NON_CLOUD_CONDITIONS = [
-      "fog", "depositing_rime_fog", "light_drizzle", "moderate_drizzle", "dense_drizzle",
-      "light_freezing_drizzle", "dense_freezing_drizzle", "slight_rain", "moderate_rain", "heavy_rain",
-      "light_freezing_rain", "heavy_freezing_rain", "slight_snow_fall", "moderate_snow_fall", "heavy_snow_fall",
-      "snow_grains", "slight_rain_showers", "moderate_rain_showers", "violent_rain_showers",
-      "slight_snow_showers", "heavy_snow_showers", "thunderstorm", "thunderstorm_slight_hail", "thunderstorm_heavy_hail"
-    ];
     if (condition && NON_CLOUD_CONDITIONS.includes(condition) && CONDITION_ICONS[condition]) {
       condIcon = CONDITION_ICONS[condition];
       condLabel = this._tc(condition);
@@ -458,16 +459,34 @@ class AthleticLayerCard extends HTMLElement {
       const precipUnit = entityAttr(h, this._e("precipitation"), "unit_of_measurement") || "mm";
 
       $("al-weather").innerHTML = `
-        ${this._weatherTile("mdi:weather-windy", this._t("tile_wind"), wind != null ? `${wind.toFixed(0)} ${windUnit} ${this._twd(dir)}` : "—")}
-        ${this._weatherTile("mdi:weather-windy-variant", this._t("tile_gusts"), gusts != null ? `${gusts.toFixed(0)} ${windUnit}` : "—")}
-        ${this._weatherTile("mdi:water-percent", this._t("tile_humidity"), hum != null ? `${hum}%` : "—")}
-        ${this._weatherTile("mdi:sun-wireless", this._t("tile_uv"), uv != null ? uv.toFixed(1) : "—")}
-        ${this._weatherTile("mdi:weather-rainy", this._t("tile_rain"), precip != null ? `${precip.toFixed(1)} ${precipUnit}` : "—")}
-        ${this._weatherTile("mdi:cloud-percent-outline", this._t("tile_rain_prob"), precipP != null ? `${precipP}%` : "—")}
-        ${this._weatherTile("mdi:cloud", this._t("tile_clouds"), cloud != null ? `${cloud}%` : "—")}
+        ${this._weatherTile("mdi:weather-windy", this._t("tile_wind"), wind != null ? `${wind.toFixed(0)} ${windUnit} ${this._twd(dir)}` : "—", {moreInfoEntity: this._e("wind_speed")})}
+        ${this._weatherTile("mdi:weather-windy-variant", this._t("tile_gusts"), gusts != null ? `${gusts.toFixed(0)} ${windUnit}` : "—", {moreInfoEntity: this._e("wind_gusts")})}
+        ${this._weatherTile("mdi:water-percent", this._t("tile_humidity"), hum != null ? `${hum}%` : "—", {moreInfoEntity: this._e("humidity")})}
+        ${this._weatherTile("mdi:sun-wireless", this._t("tile_uv"), uv != null ? uv.toFixed(1) : "—", {moreInfoEntity: this._e("uv_index")})}
+        ${this._weatherTile("mdi:weather-rainy", this._t("tile_rain"), precip != null ? `${precip.toFixed(1)} ${precipUnit}` : "—", {moreInfoEntity: this._e("precipitation")})}
+        ${this._weatherTile("mdi:cloud-percent-outline", this._t("tile_rain_prob"), precipP != null ? `${precipP}%` : "—", {moreInfoEntity: this._e("precipitation_probability")})}
+        ${this._weatherTile("mdi:cloud", this._t("tile_clouds"), cloud != null ? `${cloud}%` : "—", {moreInfoEntity: this._e("cloud_cover_perceived")})}
         ${this._weatherTile("mdi:weather-sunset-up", this._t("tile_sunrise"), sunrise && sunrise !== "unknown" ? sunrise : "—")}
         ${this._weatherTile("mdi:weather-sunset-down", this._t("tile_sunset"), sunset && sunset !== "unknown" ? sunset : "—")}
       `;
+      // Add click handler for more-info on weather tiles
+      const weatherGrid = this._card.querySelector('.al-weather-grid');
+      if (weatherGrid) {
+        weatherGrid.querySelectorAll('[data-more-info]').forEach(el => {
+          el.style.cursor = 'pointer';
+          el.addEventListener('click', (ev) => {
+            const entityId = el.getAttribute('data-more-info');
+            if (entityId && this._hass) {
+              const event = new CustomEvent('hass-more-info', {
+                detail: { entityId },
+                bubbles: true,
+                composed: true
+              });
+              el.dispatchEvent(event);
+            }
+          });
+        });
+      }
     } else {
       $("al-weather").innerHTML = "";
     }
@@ -576,7 +595,7 @@ class AthleticLayerCard extends HTMLElement {
         $("al-aq-section").innerHTML = `
           <div class="al-sect-title"><ha-icon icon="mdi:air-filter"></ha-icon> ${this._t("sect_air_quality")}</div>
           <div class="al-aq-row">
-            ${aqi != null ? `<div class="al-aq-badge" style="border-color:${aqiColor(aqi)}">
+            ${aqi != null ? `<div class="al-aq-badge" style="border-color:${aqiColor(aqi)};cursor:pointer" data-more-info="${this._e('air_quality_index')}">
               <span class="al-aq-val" style="color:${aqiColor(aqi)}">${aqi}</span>
               <span class="al-aq-label">${this._taqi(aqi)}</span>
             </div>` : ""}
@@ -584,6 +603,21 @@ class AthleticLayerCard extends HTMLElement {
             ${pm10 != null ? this._aqTile("PM10", pm10.toFixed(1), "µg/m³") : ""}
           </div>
           ${pollenHtml}`;
+        // Add click handler for more-info on AQI badge
+        const aqSection = this._card.querySelector('.al-aq-badge[data-more-info]');
+        if (aqSection) {
+          aqSection.addEventListener('click', (ev) => {
+            const entityId = aqSection.getAttribute('data-more-info');
+            if (entityId && this._hass) {
+              const event = new CustomEvent('hass-more-info', {
+                detail: { entityId },
+                bubbles: true,
+                composed: true
+              });
+              aqSection.dispatchEvent(event);
+            }
+          });
+        }
       } else {
         $("al-aq-section").innerHTML = "";
       }
@@ -611,13 +645,6 @@ class AthleticLayerCard extends HTMLElement {
             // Use weather condition for icon if precipitation/visibility/thunder, else fallback to perceived_cloud
             let hIcon;
             const hCode = hr.weather_condition || hr.weather_code;
-            const NON_CLOUD_CONDITIONS = [
-              "fog", "depositing_rime_fog", "light_drizzle", "moderate_drizzle", "dense_drizzle",
-              "light_freezing_drizzle", "dense_freezing_drizzle", "slight_rain", "moderate_rain", "heavy_rain",
-              "light_freezing_rain", "heavy_freezing_rain", "slight_snow_fall", "moderate_snow_fall", "heavy_snow_fall",
-              "snow_grains", "slight_rain_showers", "moderate_rain_showers", "violent_rain_showers",
-              "slight_snow_showers", "heavy_snow_showers", "thunderstorm", "thunderstorm_slight_hail", "thunderstorm_heavy_hail"
-            ];
             if (hCode && NON_CLOUD_CONDITIONS.includes(hCode) && CONDITION_ICONS[hCode]) {
               hIcon = CONDITION_ICONS[hCode];
             } else {
@@ -670,9 +697,11 @@ class AthleticLayerCard extends HTMLElement {
 
   /* ── Sub-renderers ──────────────────────────────────────── */
 
-  _weatherTile(icon, label, value) {
+  _weatherTile(icon, label, value, opts = {}) {
+    // If opts.moreInfoEntity is set, add a data attribute for click handling
+    const clickAttr = opts.moreInfoEntity ? `data-more-info='${opts.moreInfoEntity}'` : '';
     return `
-      <div class="al-wt">
+      <div class="al-wt" ${clickAttr}>
         <ha-icon icon="${icon}" class="al-wt-icon"></ha-icon>
         <span class="al-wt-val">${value}</span>
         <span class="al-wt-label">${label}</span>
