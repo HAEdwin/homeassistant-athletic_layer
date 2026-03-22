@@ -112,10 +112,12 @@ For each predefined zone in Home Assistant you are able to create a lovelace car
 
    | Field | Value |
    |-------|-------|
-   | URL   | `/local/athletic-layer-card.js` |
+   | URL   | `/local/athletic-layer-card.js?v=1.0.5` |
    | Type  | JavaScript Module |
 
-3. Add the card to a dashboard.
+   (to avoid caching issues the key ?v=1.0.5 is added)
+
+4. Add the card to a dashboard.
 
 ### Minimal card YAML
 
