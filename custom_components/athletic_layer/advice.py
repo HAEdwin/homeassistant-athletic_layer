@@ -205,6 +205,7 @@ class AdviceEngine:
             now = datetime.now()
         timestamp_str = _format_datetime(now, self._t)
         seed = now.strftime("%Y%m%d%H")  # stable within the same hour
+        is_day = self._is_daytime(weather, now)
 
         if location:
             sentences.append(
@@ -222,7 +223,7 @@ class AdviceEngine:
             )
 
         # ── Temperature & base layer ────────────────────────────
-        sentences.append(self._temperature_advice(weather, layers, seed))
+        sentences.append(self._temperature_advice(weather, layers, seed, is_day))
 
         # ── Rain ────────────────────────────────────────────────
         sentences.append(self._rain_advice(weather, layers, seed))
@@ -231,7 +232,6 @@ class AdviceEngine:
         sentences.append(self._wind_advice(weather, layers, seed))
 
         # ── UV / Cloud combined ─────────────────────────────────
-        is_day = self._is_daytime(weather, now)
         sentences.append(self._uv_cloud_advice(weather, layers, seed, is_day))
 
         # ── Health condition adjustments ─────────────────────────
@@ -257,7 +257,7 @@ class AdviceEngine:
 
     # ── private helpers ─────────────────────────────────────────
 
-    def _effective_temp(self, weather: WeatherSlice) -> float:
+    def _effective_temp(self, weather: WeatherSlice, is_day: bool) -> float:
         """Compute an effective 'feels like' temperature with corrections, including sun effect."""
         feels = (
             weather.feels_like
@@ -266,8 +266,7 @@ class AdviceEngine:
         )
 
         # Sun effect: if cloud cover is less than 20% and it is daytime (using sunrise/sunset), add +5
-        now = datetime.now()
-        if self._is_daytime(weather, now):
+        if is_day:
             if weather.cloud_cover is not None and weather.cloud_cover < 20:
                 feels += 5.0
 
@@ -293,8 +292,9 @@ class AdviceEngine:
         weather: WeatherSlice,
         layers: dict[str, str | list[str]],
         seed: str,
+        is_day: bool,
     ) -> str:
-        adjusted = self._effective_temp(weather)
+        adjusted = self._effective_temp(weather, is_day)
         acc = self._accessories(layers)
         t = self._t
         bike = self._sport == "cycling"
