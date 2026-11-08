@@ -1,6 +1,9 @@
 {
     "domain": "AthleticLayer",
     "name": "Athletic Layer",
+    "categories": [
+        "health_wellbeing"
+    ],
     "codeowners": ["@haedwin"],
     "config_flow": true,
     "documentation": "https://github.com/haedwin/homeassistant-Athletic_Layer",
