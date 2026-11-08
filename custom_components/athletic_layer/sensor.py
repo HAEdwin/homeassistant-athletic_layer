@@ -584,8 +584,10 @@ def compute_perceived_cloud_cover(data: dict[str, Any]) -> float | None:
     ccl = data.get("cloud_cover_low")
     ccm = data.get("cloud_cover_mid")
     cch = data.get("cloud_cover_high")
+    _LOGGER.debug("Computing perceived cloud cover from low/mid/high: %s / %s / %s", ccl, ccm, cch)
     if all(isinstance(x, (int, float)) for x in (ccl, ccm, cch)):
         val = 1.0 * ccl + 0.6 * ccm + 0.2 * cch
+        _LOGGER.debug("Raw perceived cloud cover value: %s", val)
         return min(val, 100)
     elif isinstance(ccl, (int, float)):
         return min(ccl, 100)
@@ -1001,8 +1003,12 @@ class AthleticLayerAdviceSensor(
             ha.time = times[i]
             # Add cloud_coverage for frontend icon logic
             cloud_coverage = None
+            # Use perceived cloud cover if available, else fallback
             if hasattr(ws, "cloud_cover"):
                 cloud_coverage = ws.cloud_cover
+            if hasattr(ws, "cloud_cover_perceived") and ws.cloud_cover_perceived is not None:
+                _LOGGER.debug("Hourly advice: using perceived cloud cover %s over raw %s", ws.cloud_cover_perceived, cloud_coverage)
+                cloud_coverage = ws.cloud_cover_perceived
             # Add weather_condition for icon mapping in frontend
             weather_condition = None
             if hasattr(ws, "weather_code") and ws.weather_code is not None:

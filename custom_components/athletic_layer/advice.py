@@ -258,12 +258,18 @@ class AdviceEngine:
     # ── private helpers ─────────────────────────────────────────
 
     def _effective_temp(self, weather: WeatherSlice) -> float:
-        """Compute an effective 'feels like' temperature with corrections."""
+        """Compute an effective 'feels like' temperature with corrections, including sun effect."""
         feels = (
             weather.feels_like
             if weather.feels_like is not None
             else (weather.temperature or 20.0)
         )
+
+        # Sun effect: if cloud cover is less than 20% and it is daytime (using sunrise/sunset), add +5
+        now = datetime.now()
+        if self._is_daytime(weather, now):
+            if weather.cloud_cover is not None and weather.cloud_cover < 20:
+                feels += 5.0
 
         # Health offsets
         if "cold_sensitivity" in self._conditions:
@@ -302,7 +308,7 @@ class AdviceEngine:
             layers["base"] = _pick(t, "layer_base_singlet")
             layers["bottoms"] = _pick(t, f"bottom_{bp}_shorts")
             return _pick(t, "temp_warm", seed)
-        if adjusted >= 15:
+        if adjusted >= 10:
             layers["base"] = _pick(t, "layer_base_short")
             layers["bottoms"] = _pick(t, f"bottom_{bp}_shorts")
             return _pick(t, "temp_cool", seed)
@@ -354,7 +360,7 @@ class AdviceEngine:
         mm = weather.precipitation_mm or 0
         t = self._t
 
-        if prob < 20 and mm < 0.1:
+        if prob < 30 and mm < 0.1:
             return _pick(t, "rain_none", seed)
 
         if prob < 50 or mm < 1.0:
@@ -431,7 +437,7 @@ class AdviceEngine:
         # Determine cloud band
         if cloud > 70:
             cloud_band = "heavy"
-        elif cloud > 40:
+        elif cloud > 35:
             cloud_band = "partial"
         else:
             cloud_band = "clear"
@@ -499,6 +505,10 @@ class AdviceEngine:
         # Asthma ─────────────────────────────────────────────────
         if "asthma" in self._conditions:
             has_condition = True
+            # Always suggest inhaler for asthma
+            inhaler = _pick(t, "acc_inhaler")
+            if inhaler and inhaler not in acc:
+                acc.append(inhaler)
             if (weather.pm25 or 0) > 25:
                 warnings.append(_pick(t, "asthma_pm_high", seed))
                 mask = _pick(t, "acc_face_mask")
