@@ -1,8 +1,6 @@
 {
-  "name": "athletic_layer",
+  "name": "Athletic Layer",
   "content_in_root": false,
-  "filename": "athletic_layer",
-  "country": [],
   "homeassistant": "2024.1.0",
   "render_readme": true
 }
