@@ -301,6 +301,7 @@ TEMPLATES: dict[str, dict[str, list[str]]] = {
     "acc_arm_warmers":            ["Armwarmers"],
     "acc_leg_warmers":            ["Beenwarmers"],
     "acc_reflective_vest":        ["Reflecterend / zichtbaarheidsvest"],
+    "acc_inhaler":                ["Astma-inhalator"],
 },
 
 # ════════════════════════════════════════════════════════════════════
@@ -440,6 +441,7 @@ TEMPLATES: dict[str, dict[str, list[str]]] = {
     "acc_arm_warmers":            ["Armlinge"],
     "acc_leg_warmers":            ["Beinlinge"],
     "acc_reflective_vest":        ["Reflektierende / Warnweste"],
+    "acc_inhaler":                ["Asthma-Inhalator"],
 },
 
 # ════════════════════════════════════════════════════════════════════
@@ -579,6 +581,7 @@ TEMPLATES: dict[str, dict[str, list[str]]] = {
     "acc_arm_warmers":            ["Manchettes"],
     "acc_leg_warmers":            ["Jambières"],
     "acc_reflective_vest":        ["Gilet réfléchissant / haute visibilité"],
+    "acc_inhaler":                ["Inhalateur pour l'asthme"],
 },
 
 # ════════════════════════════════════════════════════════════════════
@@ -718,6 +721,7 @@ TEMPLATES: dict[str, dict[str, list[str]]] = {
     "acc_arm_warmers":            ["Manguitos"],
     "acc_leg_warmers":            ["Perneras"],
     "acc_reflective_vest":        ["Chaleco reflectante / alta visibilidad"],
+    "acc_inhaler":                ["Inhalador para el asma"],
 },
 
 }
