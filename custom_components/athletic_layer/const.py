@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-DOMAIN = "AthleticLayer"
+DOMAIN = "athletic_layer"
 
 # ── Configuration keys ──────────────────────────────────────────────
 CONF_SPORT = "sport"
